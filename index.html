@@ -14,6 +14,20 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
 .btn-gold { background: #f59e0b; color: black; font-weight: bold; text-transform: uppercase; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; transition: 0.3s; border:none; }
 .btn-gold:hover { background: #fbbf24; transform: translateY(-2px); }
 
+/* AJUSTEMENT POUR MOBILE (Correction du texte qui se chevauche) */
+@media (max-width: 768px) {
+    #viewProjet .glass.p-8 { position: relative; padding: 20px !important; }
+    #chantierTitre { font-size: 1.5rem !important; line-height: 1.2 !important; margin-bottom: 10px !important; }
+    #viewProjet .absolute.right-8.top-8 { 
+        position: static !important; 
+        text-align: left !important; 
+        margin-top: 15px; 
+        padding-top: 15px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    #soldeChantier { font-size: 1.8rem !important; }
+}
+
 #printArea { display: none; }
 @media print {
     @page { margin: 0.8cm; size: auto; }
@@ -105,12 +119,13 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
                     <div id="listeOuvriers" class="space-y-4"></div>
                 </div>
                 <div class="lg:col-span-3 glass overflow-hidden">
-                    <table class="w-full text-left text-[11px]">
-                        <thead class="bg-slate-800 text-slate-400 font-black uppercase">
-                            <tr><th class="p-5">Opération</th><th class="p-5">Entrée</th><th class="p-5">Sortie</th><th class="p-5 text-center">Gestion</th></tr>
-                        </thead>
-                        <tbody id="tableBody" class="divide-y divide-slate-700/50"></tbody>
-                    </table>
+                    <div class="overflow-x-auto"> <table class="w-full text-left text-[11px]">
+                            <thead class="bg-slate-800 text-slate-400 font-black uppercase">
+                                <tr><th class="p-5">Opération</th><th class="p-5">Entrée</th><th class="p-5">Sortie</th><th class="p-5 text-center">Gestion</th></tr>
+                            </thead>
+                            <tbody id="tableBody" class="divide-y divide-slate-700/50"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -327,7 +342,6 @@ function toggleForm() { const v = document.getElementById('typeSaisie').value; d
 function trouverOuvrier(nom) { if(nom.length < 2) return; const found = db[currentId].flux.find(f => f.on && f.on.toLowerCase().includes(nom.toLowerCase())); if(found) { document.getElementById('fOuvJob').value = found.oj; document.getElementById('fOuvC').value = found.oc; } }
 function createChantier() { const n = document.getElementById('cNom').value; if(n) { db.push({ nom: n, lieu: document.getElementById('cLieu').value, client: document.getElementById('cClient').value, flux: [] }); saveDB(); closeModal('modalChantier'); renderHome(); } }
 
-// MODIFICATION ICI : SECURITE SUPPRESSION PROJET
 function deleteProject(e, i) { 
     e.stopPropagation(); 
     const codeCheck = prompt("SÉCURITÉ : Entrez le CODE ACCÈS pour supprimer ce projet :");
@@ -342,7 +356,6 @@ function deleteProject(e, i) {
     }
 }
 
-// MODIFICATION ICI : SECURITE SUPPRESSION LIGNE
 function deleteEntry(idx) { 
     const codeCheck = prompt("SÉCURITÉ : Entrez le CODE ACCÈS pour supprimer cette ligne :");
     if(codeCheck === config.code) {
