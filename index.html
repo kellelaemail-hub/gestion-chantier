@@ -22,11 +22,10 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
     .report-header { border-bottom: 4px solid #f59e0b; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
     .report-title { font-size: 28px; font-weight: 900; text-transform: uppercase; color: #000; }
     table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    th { background: #f8fafc !important; border: 1px solid #000; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; }
+    th { background: #f8fafc !important; border: 1px solid #000; padding: 12px; text-align: left; font-size: 11px; text-transform: uppercase; color: #000 !important; }
     td { border: 1px solid #e2e8f0; padding: 10px; font-size: 11px; color: #000 !important; }
-    .total-box { border: 2px solid #000; padding: 15px; margin-top: 20px; text-align: right; font-size: 18px; font-weight: 900; background: #f8fafc !important; }
-    .signature-grid { display: grid; grid-cols: 2; margin-top: 50px; gap: 50px; }
-    .sig-box { border-top: 1px dashed #000; padding-top: 10px; text-align: center; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+    .total-box { border: 2px solid #000; padding: 15px; margin-top: 20px; text-align: right; font-size: 18px; font-weight: 900; background: #f8fafc !important; color: #000 !important; }
+    .sig-box { border-top: 1px dashed #000; padding-top: 10px; text-align: center; font-size: 10px; font-weight: bold; text-transform: uppercase; color: #000 !important; }
 }
 </style>
 </head>
@@ -144,7 +143,6 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
 let db = JSON.parse(localStorage.getItem('PRO_DB_V9')) || [];
 let currentId = null;
 
-// GESTION ENTRÉE
 window.addEventListener('keydown', e => {
     if (e.key === 'Enter') {
         if (!document.getElementById('loginPage').classList.contains('hidden')) checkLogin();
@@ -154,7 +152,7 @@ window.addEventListener('keydown', e => {
 });
 
 function checkLogin(){
-    if(document.getElementById('passAccess').value==="2026") {
+    if(document.getElementById('passAccess').value==="1234") {
         document.getElementById('loginPage').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
         renderHome();
@@ -234,7 +232,6 @@ function renderJournal(){
     }
 }
 
-// MODIFICATION
 function editEntry(idx) {
     const f = db[currentId].flux[idx];
     document.getElementById('editIndex').value = idx;
@@ -287,16 +284,53 @@ function saveEntry() {
 }
 
 function printReport() {
-    const c = db[currentId]; let ti = 0, to = 0;
+    const c = db[currentId]; 
+    let ti = 0, to = 0, soldeP = 0;
+    let ouvriersSuivi = {};
+
     let h = `<div style="padding:40px; color:#000; background:#fff">
         <div class="report-header">
             <div><h1 class="report-title">RAPPORT DE GESTION</h1><p><b>PROJET :</b> ${c.nom.toUpperCase()}</p></div>
             <div style="text-align:right"><p><b>CLIENT :</b> ${c.client}</p><p><b>LIEU :</b> ${c.lieu}</p></div>
         </div>
-        <table><thead><tr><th>DATE</th><th>DÉSIGNATION / LIBELLÉ</th><th>ENTRÉE (FG)</th><th>SORTIE (FG)</th></tr></thead><tbody>`;
-    c.flux.forEach(f => { ti+=f.e; to+=f.s; h+=`<tr><td>${f.date}</td><td>${f.txt}</td><td>${f.e.toLocaleString()}</td><td>${f.s.toLocaleString()}</td></tr>`; });
-    h += `</tbody></table><div class="total-box">SOLDE EN CAISSE : ${(ti-to).toLocaleString()} FG</div>
-        <div class="signature-grid" style="display:flex; justify-content:space-between; margin-top:80px">
+        <table>
+            <thead>
+                <tr>
+                    <th>N°</th>
+                    <th>DATE</th>
+                    <th>DÉSIGNATION / LIBELLÉ</th>
+                    <th>ENTRÉE (FG)</th>
+                    <th>SORTIE (FG)</th>
+                    <th>RESTE (CAISSE)</th>
+                </tr>
+            </thead>
+            <tbody>`;
+    
+    c.flux.forEach((f, i) => { 
+        ti += f.e; 
+        to += f.s; 
+        soldeP += (f.e - f.s);
+        let rOuv = "";
+        
+        if(f.type === 'OUVRIER') {
+            if(!ouvriersSuivi[f.on]) ouvriersSuivi[f.on] = 0;
+            ouvriersSuivi[f.on] += f.s;
+            rOuv = `<br><span style="color:#666; font-size:9px; font-weight:normal;">(Reste Ouvrier: ${(f.oc - ouvriersSuivi[f.on]).toLocaleString()} FG)</span>`;
+        }
+        
+        h += `<tr>
+                <td style="text-align:center">${i + 1}</td>
+                <td>${f.date}</td>
+                <td><b>${f.txt}</b></td>
+                <td style="text-align:right">${f.e > 0 ? f.e.toLocaleString() : '-'}</td>
+                <td style="text-align:right">${f.s > 0 ? f.s.toLocaleString() : '-'}</td>
+                <td style="text-align:right"><b>${soldeP.toLocaleString()} FG</b>${rOuv}</td>
+              </tr>`; 
+    });
+    
+    h += `</tbody></table>
+        <div class="total-box">SOLDE FINAL EN CAISSE : ${(ti-to).toLocaleString()} FG</div>
+        <div style="display:flex; justify-content:space-between; margin-top:80px">
             <div class="sig-box" style="width:200px">LE GÉRANT (SIGNATURE)</div>
             <div class="sig-box" style="width:200px">LE CLIENT (LU ET APPROUVÉ)</div>
         </div>
