@@ -35,14 +35,15 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
     html, body { height: 99%; overflow: hidden; background: white !important; }
     #app, #loginPage, #modalCode { display: none !important; }
     #printArea { display: block !important; position: absolute; left: 0; top: 0; width: 100%; background: white !important; color: black !important; padding: 0; margin: 0; }
-    .report-header { border-bottom: 4px solid #f59e0b; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start; }
-    .report-title { font-size: 26px; font-weight: 900; text-transform: uppercase; color: #000; margin-bottom: 10px; }
+    .report-header { border-bottom: 4px solid #f59e0b; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .report-title { font-size: 22px; font-weight: 900; text-transform: uppercase; color: #000; margin-bottom: 5px; }
+    .recu-ouvrier-title { font-size: 16px !important; border-bottom: 2px solid #000; display: inline-block; margin-bottom: 10px; }
     .info-block { line-height: 1.6; }
     .info-line { font-size: 13px; color: #000 !important; margin-bottom: 4px; display: block; }
     table { width: 100%; border-collapse: collapse; margin: 15px 0; }
     th { background: #f1f5f9 !important; border: 1px solid #000; padding: 8px; text-align: left; font-size: 10px; text-transform: uppercase; color: #000 !important; }
     td { border: 1px solid #cbd5e1; padding: 6px; font-size: 10px; color: #000 !important; }
-    .total-box { border: 2px solid #000; padding: 10px; margin-top: 5px; text-align: right; font-size: 15px; font-weight: 900; background: #f8fafc !important; color: #000 !important; }
+    .total-box { border: 2px solid #000; padding: 8px; margin-top: 4px; text-align: right; font-size: 13px; font-weight: 900; background: #f8fafc !important; color: #000 !important; }
     .total-depense-rouge { color: #dc2626 !important; border-color: #dc2626 !important; }
     .cat-badge { font-size: 8px; text-transform: uppercase; background: #eee; padding: 2px 4px; border-radius: 3px; color: #666; font-weight: bold; }
 }
@@ -57,11 +58,10 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
             <i class="fa-solid fa-image mr-1"></i> Changer le logo
             <input type="file" id="logoInput" class="hidden" accept="image/*" onchange="previewImage(this)">
         </label>
-
         <h1 class="text-4xl font-black text-amber-500 mb-6 italic uppercase tracking-tighter">EKELEC</h1>
         <p class="text-[10px] text-slate-400 uppercase font-black mb-4 tracking-[3px]">Accès Gestionnaire</p>
-        <input type="text" id="userGerant" value="EKELEC" class="text-center mb-2 uppercase font-bold border-amber-500/30">
-        <input type="password" id="passAccess" placeholder="CODE ACCÈS" class="text-center text-2xl tracking-[10px]">
+        <input type="text" id="userGerant" value="EKELEC" class="text-center mb-2 uppercase font-bold border-amber-500/30" autocomplete="off">
+        <input type="password" id="passAccess" placeholder="CODE ACCÈS" class="text-center text-2xl tracking-[10px]" autocomplete="new-password">
         <button onclick="checkLogin()" class="btn-gold mt-4 shadow-xl w-full">OUVRIR LA SESSION</button>
     </div>
 </div>
@@ -92,16 +92,14 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
                     <i class="fa-solid fa-print"></i> Bilan Global
                 </button>
             </div>
-
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <div class="glass p-4 border-b-4 border-blue-500"><p class="text-[9px] uppercase font-black text-slate-400">Projets</p><p id="statTotalChantiers" class="text-2xl font-black text-white">0</p></div>
                 <div class="glass p-4 border-b-4 border-emerald-500"><p class="text-[9px] uppercase font-black text-slate-400">Total Reçu</p><p id="statTotalRecu" class="text-xl font-black text-emerald-400">0 GNF</p></div>
                 <div class="glass p-4 border-b-4 border-red-500"><p class="text-[9px] uppercase font-black text-slate-400">Total Dépensé</p><p id="statTotalDepense" class="text-xl font-black text-red-400">0 GNF</p></div>
                 <div class="glass p-4 border-b-4 border-amber-500"><p class="text-[9px] uppercase font-black text-slate-400">Solde Global</p><p id="statTotalSolde" class="text-xl font-black text-amber-500">0 GNF</p></div>
             </div>
-
             <div class="flex justify-between items-center mb-6 gap-4">
-                <input type="text" id="searchHome" oninput="renderHome()" placeholder="Rechercher..." class="max-w-xs mb-0">
+                <input type="text" id="searchHome" oninput="renderHome()" placeholder="Rechercher..." class="max-w-xs mb-0" autocomplete="off">
                 <button onclick="openModal('modalChantier')" class="bg-amber-500 text-black px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg">+ Nouveau Projet</button>
             </div>
             <div id="listeChantiers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -129,7 +127,7 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
                 <div class="lg:col-span-3 glass overflow-hidden">
                     <div class="overflow-x-auto"> <table class="w-full text-left text-[11px]">
                             <thead class="bg-slate-800 text-slate-400 font-black uppercase">
-                                <tr><th class="p-5">Opération</th><th class="p-5">Entrée</th><th class="p-5">Sortie</th><th class="p-5 text-center">Gestion</th></tr>
+                                <tr><th class="p-5">Opération</th><th class="p-5">Entrée</th><th class="p-5">Sortie</th><th class="p-5">Solde</th><th class="p-5 text-center">Gestion</th></tr>
                             </thead>
                             <tbody id="tableBody" class="divide-y divide-slate-700/50"></tbody>
                         </table>
@@ -143,7 +141,7 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
 <div id="modalCode" class="fixed inset-0 bg-black/95 hidden items-center justify-center p-4 z-[200] backdrop-blur-md">
     <div class="glass p-10 w-full max-w-md border-t-[10px] border-amber-500 shadow-2xl">
         <h3 class="font-black mb-6 uppercase text-amber-500 italic text-xl">Changer Code Accès</h3>
-        <input type="password" id="newCode" placeholder="NOUVEAU CODE">
+        <input type="password" id="newCode" placeholder="NOUVEAU CODE" autocomplete="new-password">
         <button onclick="changeCode()" class="btn-gold w-full mt-4">ENREGISTRER</button>
         <button onclick="closeModal('modalCode')" class="w-full mt-4 text-[10px] opacity-40 uppercase font-black">Annuler</button>
     </div>
@@ -153,7 +151,6 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
     <div class="glass p-10 w-full max-w-md border-t-[10px] border-amber-500 shadow-2xl overflow-y-auto max-h-[90vh]">
         <h3 class="font-black mb-4 uppercase text-amber-500 italic text-xl">Saisie de Flux</h3>
         <input type="hidden" id="editIndex">
-        
         <label class="text-[10px] font-black uppercase text-slate-400">Type de saisie</label>
         <select id="typeSaisie" onchange="toggleForm()" class="font-bold">
             <option value="DIVERS">DIVERS (Caisse)</option>
@@ -161,11 +158,12 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
             <option value="OUVRIER">OUVRIER (Main d'œuvre)</option>
             <option value="LOCATION">LOCATION</option>
         </select>
-
         <label class="text-[10px] font-black uppercase text-slate-400">Corps de métier / Catégorie</label>
         <select id="fCat" class="font-bold">
             <option value="GENERAL">Général / Divers</option>
             <option value="LOCATAIRE">Locataire</option>
+            <option value="DEVIS">Devis</option>
+            <option value="PROPRIETAIRE">Propriétaire</option>
             <option value="ELECTRICITE">Électricité</option>
             <option value="PLOMBERIE">Plomberie</option>
             <option value="MACONNERIE">Maçonnerie</option>
@@ -174,27 +172,12 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
             <option value="FORAGE">Forage</option>
             <option value="CARRELAGE">Carrelage</option>
         </select>
-
-        <div id="formD"><input type="text" id="fMotif" placeholder="Désignation"><div class="grid grid-cols-2 gap-2"><input type="number" id="fE" placeholder="Reçu"><input type="number" id="fS" placeholder="Payé"></div></div>
-        <div id="formA" class="hidden"><input type="text" id="fArtNom" placeholder="Nom article"><div class="grid grid-cols-2 gap-2"><input type="number" id="fArtP" placeholder="Prix Unit."><input type="number" id="fArtQ" placeholder="Quantité"></div></div>
-        <div id="formO" class="hidden"><input type="text" id="fOuvNom" placeholder="Nom ouvrier" oninput="trouverOuvrier(this.value)"><input type="text" id="fOuvJob" placeholder="Métier (Ex: Électricien)"><input type="number" id="fOuvC" placeholder="Montant Contrat"><input type="number" id="fOuvA" placeholder="Paiement"></div>
-        
-        <div id="formL" class="hidden">
-            <input type="text" id="fLocNom" placeholder="Nom et Prénom">
-            <input type="text" id="fLocBat" placeholder="N° de bâtiment">
-            <div class="grid grid-cols-2 gap-2">
-                <input type="number" id="fLocRecu" placeholder="Reçu (Montant)">
-                <input type="number" id="fLocPaye" placeholder="Payé (Sortie)">
-            </div>
-            <input type="text" id="fLocMois" placeholder="Le(s) mois payé(s)">
-        </div>
-        
+        <div id="formD"><input type="text" id="fMotif" placeholder="Désignation" autocomplete="off"><div class="grid grid-cols-2 gap-2"><input type="number" id="fE" placeholder="Reçu" autocomplete="off"><input type="number" id="fS" placeholder="Payé" autocomplete="off"></div></div>
+        <div id="formA" class="hidden"><input type="text" id="fArtNom" placeholder="Nom article" autocomplete="off"><div class="grid grid-cols-2 gap-2"><input type="number" id="fArtP" placeholder="Prix Unit." autocomplete="off"><input type="number" id="fArtQ" placeholder="Quantité" autocomplete="off"></div></div>
+        <div id="formO" class="hidden"><input type="text" id="fOuvNom" placeholder="Nom ouvrier" autocomplete="off" oninput="trouverOuvrier(this.value)"><input type="text" id="fOuvJob" placeholder="Métier (Ex: Électricien)" autocomplete="off"><input type="number" id="fOuvC" placeholder="Montant Contrat" autocomplete="off"><input type="number" id="fOuvA" placeholder="Paiement" autocomplete="off"></div>
+        <div id="formL" class="hidden"><input type="text" id="fLocNom" placeholder="Nom et Prénom" autocomplete="off"><input type="text" id="fLocBat" placeholder="N° de bâtiment" autocomplete="off"><div class="grid grid-cols-2 gap-2"><input type="number" id="fLocRecu" placeholder="Reçu (Montant)" autocomplete="off"><input type="number" id="fLocPaye" placeholder="Payé (Sortie)" autocomplete="off"></div><input type="text" id="fLocMois" placeholder="Le(s) mois payé(s)" autocomplete="off"></div>
         <input type="date" id="fDate">
-        
-        <div class="grid grid-cols-2 gap-3 mt-6">
-            <button onclick="saveEntry(true)" class="bg-emerald-600 text-white font-black rounded-lg text-[10px] uppercase p-4">Suivant</button>
-            <button onclick="saveEntry(false)" class="btn-gold">Valider</button>
-        </div>
+        <div class="grid grid-cols-2 gap-3 mt-6"><button onclick="saveEntry(true)" class="bg-emerald-600 text-white font-black rounded-lg text-[10px] uppercase p-4">Suivant</button><button onclick="saveEntry(false)" class="btn-gold">VALIDER</button></div>
         <button onclick="closeModal('modalSaisie')" class="w-full mt-4 text-[10px] opacity-40 uppercase font-black">Annuler</button>
     </div>
 </div>
@@ -202,10 +185,7 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
 <div id="modalChantier" class="fixed inset-0 bg-black/95 hidden items-center justify-center p-4 z-[100] backdrop-blur-md">
     <div class="glass p-10 w-full max-w-md border-t-[10px] border-amber-500 shadow-2xl">
         <h3 id="chantierModalTitre" class="font-black mb-6 uppercase text-amber-500 italic text-xl">Nouveau Projet</h3>
-        <input type="hidden" id="editChantierIndex">
-        <input type="text" id="cNom" placeholder="NOM DU CHANTIER">
-        <input type="text" id="cLieu" placeholder="LOCALISATION">
-        <input type="text" id="cClient" placeholder="NOM DU CLIENT">
+        <input type="hidden" id="editChantierIndex"><input type="text" id="cNom" placeholder="NOM DU CHANTIER" autocomplete="off"><input type="text" id="cLieu" placeholder="LOCALISATION" autocomplete="off"><input type="text" id="cClient" placeholder="NOM DU CLIENT" autocomplete="off">
         <button id="btnCreateChantier" onclick="createChantier()" class="btn-gold shadow-2xl w-full mt-4">CRÉER</button>
         <button onclick="closeModal('modalChantier')" class="w-full mt-4 text-[10px] opacity-40 uppercase font-black">Annuler</button>
     </div>
@@ -214,7 +194,6 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
 <div id="printArea"><div id="printContent"></div></div>
 
 <script>
-// --- GESTION DE L'IMAGE LOGO ---
 let currentLogo = localStorage.getItem('EKELEC_LOGO') || "https://via.placeholder.com/120?text=LOGO";
 document.getElementById('logoPreview').src = currentLogo;
 document.getElementById('navLogo').src = currentLogo; 
@@ -232,7 +211,6 @@ function previewImage(input) {
     }
 }
 
-// --- VARIABLES ET INITIALISATION ---
 let db = JSON.parse(localStorage.getItem('PRO_DB_V9')) || [];
 let config = JSON.parse(localStorage.getItem('PRO_CONFIG')) || { code: "1234" };
 let currentId = null;
@@ -242,10 +220,7 @@ function openModal(id) { document.getElementById(id).classList.remove('hidden');
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
 function goHome() { document.getElementById('viewAccueil').classList.remove('hidden'); document.getElementById('viewProjet').classList.add('hidden'); renderHome(); }
 function openProject(i) { currentId = i; document.getElementById('viewAccueil').classList.add('hidden'); document.getElementById('viewProjet').classList.remove('hidden'); document.getElementById('chantierTitre').innerText = db[i].nom; document.getElementById('chantierInfos').innerText = `${db[i].lieu || ''} | CLIENT: ${db[i].client || 'N/A'}`; renderJournal(); }
-
-function validerParEntree() {
-    if (!document.getElementById('loginPage').classList.contains('hidden')) { checkLogin(); }
-}
+function validerParEntree() { if (!document.getElementById('loginPage').classList.contains('hidden')) { checkLogin(); } }
 
 function checkLogin(){
     const gerant = document.getElementById('userGerant').value;
@@ -260,12 +235,7 @@ function checkLogin(){
 
 function changeCode() {
     const n = document.getElementById('newCode').value;
-    if(n.length >= 4) {
-        config.code = n;
-        localStorage.setItem('PRO_CONFIG', JSON.stringify(config));
-        alert("CODE MODIFIÉ");
-        closeModal('modalCode');
-    } else { alert("MINIMUM 4 CHIFFRES"); }
+    if(n.length >= 4) { config.code = n; localStorage.setItem('PRO_CONFIG', JSON.stringify(config)); alert("CODE MODIFIÉ"); closeModal('modalCode'); } else { alert("MINIMUM 4 CHIFFRES"); }
 }
 
 function toggleForm() {
@@ -276,13 +246,8 @@ function toggleForm() {
     document.getElementById('formL').classList.toggle('hidden', t !== 'LOCATION');
 }
 
-function openSaisie() {
-    viderSaisie();
-    document.getElementById('fDate').valueAsDate = new Date();
-    openModal('modalSaisie');
-}
+function openSaisie() { viderSaisie(); document.getElementById('fDate').valueAsDate = new Date(); openModal('modalSaisie'); }
 
-// NOUVELLE FONCTION POUR AJOUTER RAPIDEMENT UN ACOMPTE
 function ajouterAcompteRapide(nom, job, contrat) {
     viderSaisie();
     document.getElementById('typeSaisie').value = "OUVRIER";
@@ -300,6 +265,7 @@ function renderHome(){
     div.innerHTML = ""; let gRecu = 0, gDepense = 0;
     db.forEach((c,i)=>{
         let inT=0, outT=0; c.flux.forEach(f=>{ inT+=f.e; outT+=f.s; });
+        let soldeP = inT - outT;
         gRecu += inT; gDepense += outT;
         if(c.nom.toLowerCase().includes(search)){
             div.innerHTML += `<div class="glass p-6 relative cursor-pointer border-b-4 border-transparent hover:border-amber-500" onclick="openProject(${i})">
@@ -307,6 +273,7 @@ function renderHome(){
                 <div class="mt-4 space-y-1">
                     <div class="flex justify-between text-[10px] font-black"><span>REÇU:</span><span class="text-emerald-400">${inT.toLocaleString()} GNF</span></div>
                     <div class="flex justify-between text-[10px] font-black"><span>SORTIE:</span><span class="text-red-400">${outT.toLocaleString()} GNF</span></div>
+                    <div class="flex justify-between text-[10px] font-black pt-1 border-t border-slate-700/50"><span>SOLDE:</span><span class="text-amber-500">${soldeP.toLocaleString()} GNF</span></div>
                 </div>
                 <div class="absolute top-4 right-4 flex gap-3">
                     <button onclick="editProject(event, ${i})" class="text-blue-400 hover:text-blue-300"><i class="fa-solid fa-pen"></i></button>
@@ -323,16 +290,16 @@ function renderHome(){
 
 function renderJournal(){
     const c = db[currentId]; const tbody = document.getElementById('tableBody'); const lOuv = document.getElementById('listeOuvriers');
-    tbody.innerHTML = ""; lOuv.innerHTML = ""; let workers = {}; let solde = 0;
+    tbody.innerHTML = ""; lOuv.innerHTML = ""; let workers = {}; let runningSolde = 0;
     c.flux.forEach((f,idx)=>{
-        solde += (f.e - f.s);
+        runningSolde += (f.e - f.s);
         if(f.type==='OUVRIER'){
             if(!workers[f.on]) workers[f.on]={job:f.oj, contrat:f.oc, paye:0};
             workers[f.on].paye += f.s;
         }
-        tbody.innerHTML += `<tr><td class="p-5 font-bold uppercase">${f.txt}<br><span class="opacity-30 text-[9px] mr-2">${f.date}</span> <span class="text-[8px] bg-slate-700 px-2 py-0.5 rounded text-amber-500">${f.cat || 'GENERAL'}</span></td><td class="p-5 text-emerald-400 font-black">${f.e>0?f.e.toLocaleString():'-'}</td><td class="p-5 text-red-400 font-black">${f.s>0?f.s.toLocaleString():'-'}</td><td class="p-5 text-center flex gap-4 justify-center"><button onclick="editEntry(${idx})" class="text-blue-400"><i class="fa-solid fa-pen"></i></button><button onclick="deleteEntry(${idx})" class="text-slate-600 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+        tbody.innerHTML += `<tr><td class="p-5 font-bold uppercase">${f.txt}<br><span class="opacity-30 text-[9px] mr-2">${f.date}</span> <span class="text-[8px] bg-slate-700 px-2 py-0.5 rounded text-amber-500">${f.cat || 'GENERAL'}</span></td><td class="p-5 text-emerald-400 font-black">${f.e>0?f.e.toLocaleString():'-'}</td><td class="p-5 text-red-400 font-black">${f.s>0?f.s.toLocaleString():'-'}</td><td class="p-5 font-black text-white">${runningSolde.toLocaleString()}</td><td class="p-5 text-center flex gap-4 justify-center"><button onclick="editEntry(${idx})" class="text-blue-400"><i class="fa-solid fa-pen"></i></button><button onclick="deleteEntry(${idx})" class="text-slate-600 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
     });
-    document.getElementById('soldeChantier').innerText = solde.toLocaleString() + " GNF";
+    document.getElementById('soldeChantier').innerText = runningSolde.toLocaleString() + " GNF";
     for(let n in workers){
         let r = workers[n].contrat - workers[n].paye;
         lOuv.innerHTML += `<div class="bg-slate-900/50 p-4 rounded-xl border-l-4 border-amber-500">
@@ -343,7 +310,7 @@ function renderJournal(){
                     </button>
                     <span class="font-black text-[10px] uppercase">${n}</span>
                 </div>
-                <div class="flex gap-2"><button onclick="printRecu('${n}')" class="text-white opacity-40 hover:opacity-100 text-xs"><i class="fa-solid fa-print"></i></button></div>
+                <div class="flex gap-2"><button onclick="printRecu('${n.replace(/'/g, "\\'")}')" class="text-white opacity-40 hover:opacity-100 text-xs"><i class="fa-solid fa-print"></i></button></div>
             </div>
             <div class="flex justify-between items-end"><span class="text-[9px] opacity-30">RESTE</span><span class="font-black text-xs ${r<=0?'text-emerald-400':'text-red-400'}">${r.toLocaleString()} GNF</span></div></div>`;
     }
@@ -353,21 +320,24 @@ function saveEntry(keepOpen) {
     const idx = document.getElementById('editIndex').value; 
     const type = document.getElementById('typeSaisie').value;
     let entry = { type: type, date: document.getElementById('fDate').value, cat: document.getElementById('fCat').value, e: 0, s: 0, txt: "", oc: 0, on: "", oj: "", locBat: "", locMois: "" };
-    
     if(type === 'DIVERS') { 
         entry.e = parseFloat(document.getElementById('fE').value) || 0; 
         entry.s = parseFloat(document.getElementById('fS').value) || 0; 
         entry.txt = document.getElementById('fMotif').value || "Divers"; 
+        if(entry.e === 0 && entry.s === 0 && entry.txt === "Divers") { alert("SAISIE VIDE !"); return; }
     }
     else if(type === 'ARTICLE') { 
         let p = parseFloat(document.getElementById('fArtP').value) || 0, q = parseFloat(document.getElementById('fArtQ').value) || 0; 
-        entry.s = p * q; entry.txt = `ARTICLE : ${document.getElementById('fArtNom').value.toUpperCase()} (x${q})`; 
+        let nomArt = document.getElementById('fArtNom').value;
+        if(!nomArt || (p*q === 0)) { alert("NOM OU PRIX MANQUANT !"); return; }
+        entry.s = p * q; entry.txt = `ARTICLE : ${nomArt.toUpperCase()} (x${q})`; 
     }
     else if(type === 'OUVRIER') { 
         entry.on = document.getElementById('fOuvNom').value.trim(); 
         entry.oj = document.getElementById('fOuvJob').value; 
         entry.oc = parseFloat(document.getElementById('fOuvC').value) || 0; 
         entry.s = parseFloat(document.getElementById('fOuvA').value) || 0; 
+        if(!entry.on) { alert("NOM OUVRIER MANQUANT !"); return; }
         entry.txt = `PAYE : ${entry.on.toUpperCase()}`; 
     }
     else if(type === 'LOCATION') {
@@ -376,11 +346,10 @@ function saveEntry(keepOpen) {
         const mois = document.getElementById('fLocMois').value;
         entry.e = parseFloat(document.getElementById('fLocRecu').value) || 0;
         entry.s = parseFloat(document.getElementById('fLocPaye').value) || 0;
-        entry.locBat = bat;
-        entry.locMois = mois;
+        if(!nom || (entry.e === 0 && entry.s === 0)) { alert("NOM OU MONTANT MANQUANT !"); return; }
+        entry.locBat = bat; entry.locMois = mois;
         entry.txt = `LOCATION : ${nom} (BAT: ${bat}) - MOIS: ${mois}`;
     }
-
     if(idx !== "") db[currentId].flux[idx] = entry; else db[currentId].flux.push(entry);
     saveDB(); renderJournal();
     if(keepOpen) { viderSaisie(); document.getElementById('fDate').valueAsDate = new Date(); } else { closeModal('modalSaisie'); }
@@ -394,12 +363,7 @@ function viderSaisie() {
     toggleForm();
 }
 
-function deleteEntry(idx) {
-    if(confirm("Supprimer cette ligne ?")) {
-        db[currentId].flux.splice(idx, 1);
-        saveDB(); renderJournal();
-    }
-}
+function deleteEntry(idx) { if(confirm("Supprimer cette ligne ?")) { db[currentId].flux.splice(idx, 1); saveDB(); renderJournal(); } }
 
 function editProject(e, i) {
     e.stopPropagation();
@@ -424,36 +388,22 @@ function createChantier() {
         } else {
             db.push({ nom: n, lieu: document.getElementById('cLieu').value, client: document.getElementById('cClient').value, flux: [] }); 
         }
-        saveDB(); 
-        closeModal('modalChantier'); 
-        document.getElementById('editChantierIndex').value = "";
-        document.getElementById('chantierModalTitre').innerText = "Nouveau Projet";
-        document.getElementById('btnCreateChantier').innerText = "CRÉER";
-        renderHome(); 
+        saveDB(); closeModal('modalChantier'); renderHome(); 
     } 
 }
 
 function deleteProject(e, i) { 
     e.stopPropagation(); 
     const codeCheck = prompt("SÉCURITÉ : Entrez le CODE ACCÈS pour supprimer ce projet :");
-    if(codeCheck === config.code) {
-        if(confirm("Confirmer définitivement la suppression ?")) {
-            db.splice(i,1); 
-            saveDB(); 
-            renderHome(); 
-        }
-    } else if (codeCheck !== null) {
-        alert("CODE INCORRECT ! Suppression annulée.");
-    }
+    if(codeCheck === config.code) { if(confirm("Confirmer définitivement la suppression ?")) { db.splice(i,1); saveDB(); renderHome(); } }
 }
 
 function printReport() { 
     const c = db[currentId]; let ti = 0, to = 0, soldeCaisse = 0; let ouvriersSuivi = {}; 
     const gerant = document.getElementById('userGerant').value.toUpperCase(); 
-    let h = `<div style="padding:40px; background:#fff; color:#000">
+    let h = `<div style="padding:30px; background:#fff; color:#000">
         <div class="report-header">
             <div class="info-block">
-                <img src="${currentLogo}" style="height:60px; margin-bottom:10px;">
                 <h1 class="report-title">RAPPORT D'ACTIVITÉ</h1>
                 <span class="info-line">PROJET : <b>${c.nom.toUpperCase()}</b></span>
                 <span class="info-line">CLIENT : <b>${c.client.toUpperCase() || 'N/A'}</b></span>
@@ -465,14 +415,13 @@ function printReport() {
             </div>
         </div>
         <table><thead><tr><th>DATE</th><th>LIBELLÉ (CATÉGORIE)</th><th>ENTRÉE</th><th>SORTIE</th><th>SOLDE</th></tr></thead><tbody>`; 
-    
     c.flux.forEach((f) => { 
         ti += f.e; to += f.s; soldeCaisse += (f.e - f.s); 
         let sortieTxt = f.s > 0 ? f.s.toLocaleString() : '-'; 
         if(f.type === 'OUVRIER') { 
             if(!ouvriersSuivi[f.on]) ouvriersSuivi[f.on] = 0; 
             ouvriersSuivi[f.on] += f.s; 
-            sortieTxt = `<b>${f.s.toLocaleString()}</b> <span class="reste-txt">(Reste : ${(f.oc - ouvriersSuivi[f.on]).toLocaleString()})</span>`; 
+            sortieTxt = `<b>${f.s.toLocaleString()}</b> <span style="font-size:8px">(Reste: ${(f.oc - ouvriersSuivi[f.on]).toLocaleString()})</span>`; 
         } 
         h += `<tr><td>${f.date}</td><td><b>${f.txt}</b> <span class="cat-badge">${f.cat || 'GENERAL'}</span></td><td style="text-align:right">${f.e>0?f.e.toLocaleString():'-'}</td><td style="text-align:right">${sortieTxt}</td><td style="text-align:right; background:#f8fafc"><b>${soldeCaisse.toLocaleString()}</b></td></tr>`; 
     }); 
@@ -482,10 +431,9 @@ function printReport() {
 
 function printGlobalReport() { 
     let gRecu = 0, gDepense = 0; const gerant = document.getElementById('userGerant').value.toUpperCase(); 
-    let h = `<div style="padding:40px; color:#000; background:#fff">
+    let h = `<div style="padding:30px; color:#000; background:#fff">
         <div class="report-header">
             <div>
-                <img src="${currentLogo}" style="height:60px; margin-bottom:10px;">
                 <h1 class="report-title">BILAN GÉNÉRAL</h1>
                 <p class="info-line">GÉRANT : <b>${gerant}</b></p>
             </div>
@@ -501,6 +449,38 @@ function printGlobalReport() {
     document.getElementById('printContent').innerHTML = h; window.print(); 
 }
 
+function printRecu(nomOuvrier) {
+    const c = db[currentId];
+    const gerant = document.getElementById('userGerant').value.toUpperCase();
+    let totalPaye = 0, contrat = 0, metier = "";
+    let lignes = c.flux.filter(f => f.type === 'OUVRIER' && f.on === nomOuvrier);
+    if (lignes.length > 0) { contrat = lignes[0].oc; metier = lignes[0].oj; }
+    let h = `<div style="padding:30px; color:#000; background:#fff">
+        <div class="report-header">
+            <div>
+                <h1 class="report-title recu-ouvrier-title">REÇU DE PAIEMENT</h1>
+                <p class="info-line">OUVRIER : <b>${nomOuvrier.toUpperCase()}</b> (${metier})</p>
+                <p class="info-line">PROJET : <b>${c.nom.toUpperCase()}</b></p>
+            </div>
+            <div style="text-align:right"><p class="info-line">DATE : <b>${new Date().toLocaleDateString()}</b></p></div>
+        </div>
+        <table><thead><tr><th>DATE</th><th>DÉSIGNATION</th><th>MONTANT REÇU</th></tr></thead><tbody>`;
+    lignes.forEach(l => {
+        totalPaye += l.s;
+        h += `<tr><td>${l.date}</td><td>Acompte / Paiement</td><td style="text-align:right">${l.s.toLocaleString()} GNF</td></tr>`;
+    });
+    h += `</tbody></table>
+        <div class="total-box">CONTRAT : ${contrat.toLocaleString()} GNF</div>
+        <div class="total-box">TOTAL DÉJÀ PAYÉ : ${totalPaye.toLocaleString()} GNF</div>
+        <div class="total-box" style="border-top: 3px solid #000">RESTE À PAYER : ${(contrat - totalPaye).toLocaleString()} GNF</div>
+        <div style="margin-top:40px; display:flex; justify-content:space-between; font-size:11px">
+            <p style="text-decoration:underline">Signature Ouvrier</p>
+            <p style="text-decoration:underline">Signature Gérant (${gerant})</p>
+        </div>
+    </div>`;
+    document.getElementById('printContent').innerHTML = h; window.print();
+}
+
 function editEntry(idx) { 
     const f = db[currentId].flux[idx]; 
     document.getElementById('editIndex').value = idx; 
@@ -508,193 +488,52 @@ function editEntry(idx) {
     document.getElementById('fCat').value = f.cat || 'GENERAL'; 
     toggleForm(); 
     document.getElementById('fDate').value = f.date; 
-    
-    if(f.type==='DIVERS'){ 
-        document.getElementById('fMotif').value=f.txt; 
-        document.getElementById('fE').value=f.e; 
-        document.getElementById('fS').value=f.s; 
-    } else if(f.type==='ARTICLE'){ 
+    if(f.type==='DIVERS'){ document.getElementById('fMotif').value=f.txt; document.getElementById('fE').value=f.e; document.getElementById('fS').value=f.s; } 
+    else if(f.type==='ARTICLE'){ 
         document.getElementById('fArtNom').value=f.txt.replace('ARTICLE : ','').split(' (')[0]; 
-        let parts = f.txt.match(/\(x(\d+)\)/); 
-        let q = parts ? parseInt(parts[1]) : 1; 
-        document.getElementById('fArtQ').value = q;
-        document.getElementById('fArtP').value = f.s / q;
+        let parts = f.txt.match(/\(x(\d+)\)/); let q = parts ? parseInt(parts[1]) : 1;
+        document.getElementById('fArtQ').value = q; document.getElementById('fArtP').value = f.s / q;
     } else if(f.type==='OUVRIER'){
-        document.getElementById('fOuvNom').value = f.on;
-        document.getElementById('fOuvJob').value = f.oj;
-        document.getElementById('fOuvC').value = f.oc;
-        document.getElementById('fOuvA').value = f.s;
+        document.getElementById('fOuvNom').value = f.on; document.getElementById('fOuvJob').value = f.oj;
+        document.getElementById('fOuvC').value = f.oc; document.getElementById('fOuvA').value = f.s;
     } else if(f.type==='LOCATION'){
-        document.getElementById('fLocNom').value = f.txt.split(' : ')[1].split(' (')[0];
-        document.getElementById('fLocBat').value = f.locBat;
-        document.getElementById('fLocMois').value = f.locMois;
-        document.getElementById('fLocRecu').value = f.e;
-        document.getElementById('fLocPaye').value = f.s;
+        document.getElementById('fLocNom').value = f.txt.replace('LOCATION : ', '').split(' (')[0];
+        document.getElementById('fLocBat').value = f.locBat; document.getElementById('fLocMois').value = f.locMois;
+        document.getElementById('fLocRecu').value = f.e; document.getElementById('fLocPaye').value = f.s;
     }
     openModal('modalSaisie');
 }
 
-// CETTE FONCTION COMMANDE LE BOUTON D'IMPRESSION DE L'OUVRIER
-function printRecu(nomOuvrier) {
-    const c = db[currentId];
-    const gerant = document.getElementById('userGerant').value.toUpperCase();
-    let totalPaye = 0;
-    let contrat = 0;
-    let metier = "";
-    let lignes = "";
-
-    c.flux.forEach(f => {
-        if (f.type === 'OUVRIER' && f.on === nomOuvrier) {
-            totalPaye += f.s;
-            contrat = f.oc;
-            metier = f.oj;
-            lignes += `<tr>
-                <td style="border: 1px solid #ddd; padding: 8px;">${f.date}</td>
-                <td style="border: 1px solid #ddd; padding: 8px;">Paiement Acompte</td>
-                <td style="border: 1px solid #ddd; padding: 8px; text-align:right;">${f.s.toLocaleString()} GNF</td>
-            </tr>`;
-        }
-    });
-
-    let h = `
-    <div style="padding:30px; color:black; background:white; font-family:Arial, sans-serif;">
-        <div style="display:flex; justify-content:space-between; border-bottom:3px solid #f59e0b; padding-bottom:10px;">
-            <div>
-                <img src="${currentLogo}" style="height:50px;">
-                <h2 style="margin:5px 0;">REÇU DE PAIEMENT</h2>
-                <p>Ouvrier: <b>${nomOuvrier.toUpperCase()}</b> (${metier})</p>
-            </div>
-            <div style="text-align:right;">
-                <p>Projet: <b>${c.nom}</b></p>
-                <p>Date: ${new Date().toLocaleDateString()}</p>
-                <p>Gérant: ${gerant}</p>
-            </div>
-        </div>
-        <table style="width:100%; border-collapse:collapse; margin-top:20px;">
-            <thead>
-                <tr style="background:#f2f2f2;">
-                    <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Date</th>
-                    <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Libellé</th>
-                    <th style="border: 1px solid #ddd; padding: 8px; text-align:right;">Montant</th>
-                </tr>
-            </thead>
-            <tbody>${lignes}</tbody>
-        </table>
-        <div style="margin-top:20px; text-align:right;">
-            <p>Total Contrat: <b>${contrat.toLocaleString()} GNF</b></p>
-            <p>Déjà Payé: <b>${totalPaye.toLocaleString()} GNF</b></p>
-            <h3 style="background:#f2f2f2; padding:10px;">RESTE À PAYER: ${(contrat - totalPaye).toLocaleString()} GNF</h3>
-        </div>
-        <div style="margin-top:40px; display:flex; justify-content:space-between;">
-            <p style="border-top:1px solid black; width:150px; text-align:center;">Signature Ouvrier</p>
-            <p style="border-top:1px solid black; width:150px; text-align:center;">Signature Gérant</p>
-        </div>
-    </div>`;
-
-    document.getElementById('printContent').innerHTML = h;
-    window.print();
-}
-
 function trouverOuvrier(nom) {
-    if(!nom) return;
-    db[currentId].flux.forEach(f => {
-        if(f.type === 'OUVRIER' && f.on.toLowerCase() === nom.toLowerCase()) {
-            document.getElementById('fOuvJob').value = f.oj;
-            document.getElementById('fOuvC').value = f.oc;
-        }
-    });
+    if(!nom || nom.length < 2) return;
+    for(let p of db) {
+        let f = p.flux.find(x => x.type === 'OUVRIER' && x.on.toLowerCase().includes(nom.toLowerCase()));
+        if(f) { document.getElementById('fOuvJob').value = f.oj; document.getElementById('fOuvC').value = f.oc; break; }
+    }
 }
 
 function exportData() {
     const data = JSON.stringify({db, config, logo: currentLogo});
     const blob = new Blob([data], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `EKELEC_SAVE_${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
+    const a = document.createElement('a'); a.href = url; a.download = 'EKELEC_SAVE.json'; a.click();
 }
 
 function importData() {
     const file = document.getElementById('importFile').files[0];
-    if (!file) return;
+    if(!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
-        const imported = JSON.parse(e.target.result);
-        db = imported.db;
-        config = imported.config;
-        if(imported.logo) {
-            currentLogo = imported.logo;
-            localStorage.setItem('EKELEC_LOGO', currentLogo);
-        }
-        saveDB();
-        location.reload();
+        try {
+            const data = JSON.parse(e.target.result);
+            db = data.db; config = data.config;
+            if(data.logo) { currentLogo = data.logo; localStorage.setItem('EKELEC_LOGO', currentLogo); }
+            saveDB(); localStorage.setItem('PRO_CONFIG', JSON.stringify(config));
+            location.reload();
+        } catch(e) { alert("ERREUR IMPORT"); }
     };
     reader.readAsText(file);
 }
-function printRecu(nomOuvrier) {
-    const c = db[currentId];
-    let totalPaye = 0, contrat = 0, metier = "", lignes = "";
-    
-    // On cherche tous les paiements de cet ouvrier
-    c.flux.forEach(f => {
-        if (f.type === 'OUVRIER' && f.on === nomOuvrier) {
-            totalPaye += f.s;
-            contrat = f.oc;
-            metier = f.oj;
-            lignes += `<tr>
-                <td>${f.date}</td>
-                <td>Paiement / Acompte</td>
-                <td style="text-align:right">${f.s.toLocaleString()} GNF</td>
-            </tr>`;
-        }
-    });
-
-    let h = `
-    <div style="padding:30px; font-family:Arial, sans-serif; color:black; background:white;">
-        <div style="display:flex; justify-content:between; border-bottom:3px solid #f59e0b; padding-bottom:10px;">
-            <div>
-                <img src="${currentLogo}" style="height:60px;">
-                <h2 style="margin:5px 0;">REÇU DE PAIEMENT</h2>
-            </div>
-            <div style="text-align:right; flex-grow:1;">
-                <p><b>PROJET :</b> ${c.nom.toUpperCase()}</p>
-                <p><b>DATE :</b> ${new Date().toLocaleDateString()}</p>
-            </div>
-        </div>
-        
-        <div style="margin:20px 0;">
-            <p>NOM DE L'OUVRIER : <b>${nomOuvrier.toUpperCase()}</b></p>
-            <p>CORPS DE MÉTIER : <b>${metier.toUpperCase()}</b></p>
-        </div>
-
-        <table style="width:100%; border-collapse:collapse; margin-top:10px;">
-            <thead>
-                <tr style="background:#f2f2f2;">
-                    <th style="border:1px solid #ddd; padding:10px; text-align:left;">DATE</th>
-                    <th style="border:1px solid #ddd; padding:10px; text-align:left;">DÉSIGNATION</th>
-                    <th style="border:1px solid #ddd; padding:10px; text-align:right;">MONTANT</th>
-                </tr>
-            </thead>
-            <tbody>${lignes}</tbody>
-        </table>
-
-        <div style="margin-top:20px; text-align:right; line-height:1.8;">
-            <p>MONTANT TOTAL DU CONTRAT : <b>${contrat.toLocaleString()} GNF</b></p>
-            <p>TOTAL DÉJÀ VERSÉ : <b>${totalPaye.toLocaleString()} GNF</b></p>
-            <div style="font-size:18px; border:2px solid black; display:inline-block; padding:10px; margin-top:10px;">
-                RESTE À PAYER : <b style="color:red;">${(contrat - totalPaye).toLocaleString()} GNF</b>
-            </div>
-        </div>
-
-        <div style="margin-top:50px; display:flex; justify-content:space-between;">
-            <p style="text-decoration:underline;">Signature Ouvrier</p>
-            <p style="text-decoration:underline;">Signature Gestionnaire</p>
-        </div>
-    </div>`;
-
-    document.getElementById('printContent').innerHTML = h;
-    window.print();
-}</script>
+</script>
 </body>
 </html>
