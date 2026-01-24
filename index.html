@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EKELEC V9.9.9</title>
+<title>EKELEC V1.0.0.1</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -71,7 +71,7 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
         <div class="flex flex-col leading-none">
             <div class="font-black text-amber-500 uppercase italic flex items-center gap-2">
                 <img id="navLogo" src="" style="height: 25px; width: 25px; object-fit: contain; border-radius: 4px;"> 
-                EKELEC <span class="text-[9px] bg-amber-500/20 px-2 py-1 rounded text-amber-200">V9.9.9</span>
+                EKELEC <span class="text-[9px] bg-amber-500/20 px-2 py-1 rounded text-amber-200">V1.0.0.1</span>
             </div>
             <span id="displayGerant" class="text-[9px] font-black uppercase text-slate-400 mt-1 opacity-70">GÉRANT : </span>
         </div>
@@ -100,7 +100,7 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
             </div>
             <div class="flex justify-between items-center mb-6 gap-4">
                 <input type="text" id="searchHome" oninput="renderHome()" placeholder="Rechercher..." class="max-w-xs mb-0" autocomplete="off">
-                <button onclick="openModal('modalChantier')" class="bg-amber-500 text-black px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg">+ Nouveau Projet</button>
+                <button onclick="viderChantier(); openModal('modalChantier')" class="bg-amber-500 text-black px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg">+ Nouveau Projet</button>
             </div>
             <div id="listeChantiers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
@@ -174,7 +174,7 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
         </select>
         <div id="formD"><input type="text" id="fMotif" placeholder="Désignation" autocomplete="off"><div class="grid grid-cols-2 gap-2"><input type="number" id="fE" placeholder="Reçu" autocomplete="off"><input type="number" id="fS" placeholder="Payé" autocomplete="off"></div></div>
         <div id="formA" class="hidden"><input type="text" id="fArtNom" placeholder="Nom article" autocomplete="off"><div class="grid grid-cols-2 gap-2"><input type="number" id="fArtP" placeholder="Prix Unit." autocomplete="off"><input type="number" id="fArtQ" placeholder="Quantité" autocomplete="off"></div></div>
-        <div id="formO" class="hidden"><input type="text" id="fOuvNom" placeholder="Nom ouvrier" autocomplete="off" oninput="trouverOuvrier(this.value)"><input type="text" id="fOuvJob" placeholder="Métier (Ex: Électricien)" autocomplete="off"><input type="number" id="fOuvC" placeholder="Montant Contrat" autocomplete="off"><input type="number" id="fOuvA" placeholder="Paiement" autocomplete="off"></div>
+        <div id="formO" class="hidden"><input type="text" id="fOuvNom" placeholder="Nom ouvrier" autocomplete="off"><input type="text" id="fOuvJob" placeholder="Métier (Ex: Électricien)" autocomplete="off"><input type="number" id="fOuvC" placeholder="Montant Contrat" autocomplete="off"><input type="number" id="fOuvA" placeholder="Paiement" autocomplete="off"></div>
         <div id="formL" class="hidden"><input type="text" id="fLocNom" placeholder="Nom et Prénom" autocomplete="off"><input type="text" id="fLocBat" placeholder="N° de bâtiment" autocomplete="off"><div class="grid grid-cols-2 gap-2"><input type="number" id="fLocRecu" placeholder="Reçu (Montant)" autocomplete="off"><input type="number" id="fLocPaye" placeholder="Payé (Sortie)" autocomplete="off"></div><input type="text" id="fLocMois" placeholder="Le(s) mois payé(s)" autocomplete="off"></div>
         <input type="date" id="fDate">
         <div class="grid grid-cols-2 gap-3 mt-6"><button onclick="saveEntry(true)" class="bg-emerald-600 text-white font-black rounded-lg text-[10px] uppercase p-4">Suivant</button><button onclick="saveEntry(false)" class="btn-gold">VALIDER</button></div>
@@ -215,7 +215,6 @@ let db = JSON.parse(localStorage.getItem('PRO_DB_V9')) || [];
 let config = JSON.parse(localStorage.getItem('PRO_CONFIG')) || { code: "1234" };
 let currentId = null;
 
-// AU CHARGEMENT : Affiche le dernier gérant
 window.onload = () => {
     const dernierGerant = localStorage.getItem('DERNIER_GERANT');
     if (dernierGerant) {
@@ -234,16 +233,14 @@ function checkLogin(){
     const gerant = document.getElementById('userGerant').value;
     const pass = document.getElementById('passAccess').value;
     if(pass === config.code && gerant.trim() !== "") {
-        // Sauvegarde le nom du gérant
         localStorage.setItem('DERNIER_GERANT', gerant);
-        
         document.getElementById('displayGerant').innerText = "GÉRANT : " + gerant.toUpperCase();
         document.getElementById('loginPage').classList.add('hidden');
         document.getElementById('app').classList.remove('hidden');
         renderHome();
     } else { 
         alert("CODE INCORRECT"); 
-        document.getElementById('passAccess').value = ""; // Vide le code si erreur
+        document.getElementById('passAccess').value = "";
     }
 }
 
@@ -330,6 +327,38 @@ function renderJournal(){
     }
 }
 
+function editEntry(idx) {
+    const f = db[currentId].flux[idx];
+    document.getElementById('editIndex').value = idx;
+    document.getElementById('typeSaisie').value = f.type;
+    toggleForm();
+    document.getElementById('fDate').value = f.date;
+    document.getElementById('fCat').value = f.cat || "GENERAL";
+    if(f.type === 'DIVERS') {
+        document.getElementById('fE').value = f.e;
+        document.getElementById('fS').value = f.s;
+        document.getElementById('fMotif').value = f.txt;
+    } else if(f.type === 'ARTICLE') {
+        document.getElementById('fArtNom').value = f.txt.replace("ARTICLE : ", "").split(" (x")[0];
+        let qMatch = f.txt.match(/\(x(\d+)\)/);
+        let q = qMatch ? parseInt(qMatch[1]) : 1;
+        document.getElementById('fArtP').value = f.s / q;
+        document.getElementById('fArtQ').value = q;
+    } else if(f.type === 'OUVRIER') {
+        document.getElementById('fOuvNom').value = f.on;
+        document.getElementById('fOuvJob').value = f.oj;
+        document.getElementById('fOuvC').value = f.oc;
+        document.getElementById('fOuvA').value = f.s;
+    } else if(f.type === 'LOCATION') {
+        document.getElementById('fLocNom').value = f.txt.split(" : ")[1].split(" (")[0];
+        document.getElementById('fLocBat').value = f.locBat;
+        document.getElementById('fLocMois').value = f.locMois;
+        document.getElementById('fLocRecu').value = f.e;
+        document.getElementById('fLocPaye').value = f.s;
+    }
+    openModal('modalSaisie');
+}
+
 function saveEntry(keepOpen) {
     const idx = document.getElementById('editIndex').value; 
     const type = document.getElementById('typeSaisie').value;
@@ -366,11 +395,8 @@ function saveEntry(keepOpen) {
     }
     if(idx !== "") db[currentId].flux[idx] = entry; else db[currentId].flux.push(entry);
     saveDB(); renderJournal();
-    
-    // MODIFICATION : On vide toujours les champs après validation
     viderSaisie();
     document.getElementById('fDate').valueAsDate = new Date();
-    
     if(!keepOpen) { closeModal('modalSaisie'); }
 }
 
@@ -383,6 +409,15 @@ function viderSaisie() {
 }
 
 function deleteEntry(idx) { if(confirm("Supprimer cette ligne ?")) { db[currentId].flux.splice(idx, 1); saveDB(); renderJournal(); } }
+
+function viderChantier() {
+    document.getElementById('cNom').value = "";
+    document.getElementById('cLieu').value = "";
+    document.getElementById('cClient').value = "";
+    document.getElementById('editChantierIndex').value = "";
+    document.getElementById('chantierModalTitre').innerText = "Nouveau Projet";
+    document.getElementById('btnCreateChantier').innerText = "CRÉER";
+}
 
 function editProject(e, i) {
     e.stopPropagation();
@@ -408,13 +443,7 @@ function createChantier() {
             db.push({ nom: n, lieu: document.getElementById('cLieu').value, client: document.getElementById('cClient').value, flux: [] }); 
         }
         saveDB(); 
-        
-        // MODIFICATION : Vide les champs du projet après création
-        document.getElementById('cNom').value = "";
-        document.getElementById('cLieu').value = "";
-        document.getElementById('cClient').value = "";
-        document.getElementById('editChantierIndex').value = "";
-        
+        viderChantier();
         closeModal('modalChantier'); 
         renderHome(); 
     } 
@@ -457,6 +486,39 @@ function printReport() {
     document.getElementById('printContent').innerHTML = h; window.print(); 
 }
 
+function printRecu(nomOuvrier) {
+    const c = db[currentId];
+    let payeTotal = 0, contrat = 0, métier = "";
+    let history = "";
+    c.flux.forEach(f => {
+        if(f.type === 'OUVRIER' && f.on === nomOuvrier) {
+            payeTotal += f.s;
+            contrat = f.oc;
+            métier = f.oj;
+            history += `<tr><td>${f.date}</td><td>Acompte / Paiement</td><td style="text-align:right">${f.s.toLocaleString()} GNF</td></tr>`;
+        }
+    });
+    let h = `<div style="padding:40px; color:#000; background:#fff; font-family:sans-serif;">
+        <div class="report-header">
+            <div><h1 class="report-title">REÇU DE PAIEMENT</h1><p class="recu-ouvrier-title">OUVRIER : <b>${nomOuvrier.toUpperCase()}</b></p></div>
+            <div style="text-align:right"><p class="info-line">DATE : ${new Date().toLocaleDateString()}</p></div>
+        </div>
+        <div style="margin-bottom:20px;">
+            <p class="info-line">PROJET : <b>${c.nom.toUpperCase()}</b></p>
+            <p class="info-line">MÉTIER : <b>${métier.toUpperCase()}</b></p>
+            <p class="info-line">MONTANT CONTRAT : <b>${contrat.toLocaleString()} GNF</b></p>
+        </div>
+        <table><thead><tr><th>DATE</th><th>DESCRIPTION</th><th>MONTANT</th></tr></thead><tbody>${history}</tbody></table>
+        <div class="total-box">TOTAL PAYÉ : ${payeTotal.toLocaleString()} GNF</div>
+        <div class="total-box ${contrat-payeTotal > 0 ? 'total-depense-rouge' : ''}">RESTE À PAYER : ${(contrat-payeTotal).toLocaleString()} GNF</div>
+        <div style="margin-top:50px; display:flex; justify-content:space-between;">
+            <div style="text-align:center; border-top:1px solid #000; width:200px; padding-top:10px;">SIGNATURE OUVRIER</div>
+            <div style="text-align:center; border-top:1px solid #000; width:200px; padding-top:10px;">SIGNATURE CAISSIER</div>
+        </div>
+    </div>`;
+    document.getElementById('printContent').innerHTML = h; window.print();
+}
+
 function printGlobalReport() { 
     let gRecu = 0, gDepense = 0; const gerant = document.getElementById('userGerant').value.toUpperCase(); 
     let h = `<div style="padding:30px; color:#000; background:#fff">
@@ -470,59 +532,16 @@ function printGlobalReport() {
         <table><thead><tr><th>CHANTIER</th><th>CLIENT</th><th>REÇU</th><th>DÉPENSÉ</th><th>SOLDE</th></tr></thead><tbody>`; 
     db.forEach(c => { 
         let inT=0, outT=0; c.flux.forEach(f=>{ inT+=f.e; outT+=f.s; }); 
-        gRecu += inT; gDepense += outT; 
-        h += `<tr><td><b>${c.nom.toUpperCase()}</b></td><td>${c.client || '-'}</td><td style="text-align:right">${inT.toLocaleString()}</td><td style="text-align:right">${outT.toLocaleString()}</td><td style="text-align:right"><b>${(inT-outT).toLocaleString()}</b></td></tr>`; 
-    }); 
-    h += `</tbody></table><div class="total-box total-depense-rouge">TOTAL DÉPENSÉ : ${gDepense.toLocaleString()} GNF</div><div class="total-box">SOLDE GLOBAL : ${(gRecu-gDepense).toLocaleString()} GNF</div></div>`; 
-    document.getElementById('printContent').innerHTML = h; window.print(); 
-}
-
-function printRecu(nomOuvrier) {
-    const c = db[currentId];
-    const gerant = document.getElementById('userGerant').value.toUpperCase();
-    let totalPaye = 0, contrat = 0, metier = "";
-    let lignes = c.flux.filter(f => f.type === 'OUVRIER' && f.on === nomOuvrier);
-    if (lignes.length > 0) { contrat = lignes[0].oc; metier = lignes[0].oj; }
-    lignes.forEach(l => totalPaye += l.s);
-
-    let h = `<div style="padding:30px; color:#000; background:#fff; font-family: sans-serif;">
-        <div class="report-header">
-            <div>
-                <h1 class="report-title">REÇU DE PAIEMENT</h1>
-                <p class="info-line">PROJET : <b>${c.nom.toUpperCase()}</b></p>
-            </div>
-            <div style="text-align:right">
-                <p class="info-line">DATE : ${new Date().toLocaleDateString()}</p>
-                <p class="info-line">GÉRANT : ${gerant}</p>
-            </div>
-        </div>
-        <div style="margin: 20px 0; border: 1px solid #000; padding: 15px;">
-            <p>NOM DE L'OUVRIER : <b>${nomOuvrier.toUpperCase()}</b></p>
-            <p>MÉTIER : <b>${metier}</b></p>
-            <p>MONTANT TOTAL DU CONTRAT : <b>${contrat.toLocaleString()} GNF</b></p>
-        </div>
-        <table>
-            <thead><tr><th>DATE</th><th>DÉSIGNATION</th><th>MONTANT PAYÉ</th></tr></thead>
-            <tbody>`;
-    lignes.forEach(l => {
-        h += `<tr><td>${l.date}</td><td>Acompte / Paiement</td><td style="text-align:right">${l.s.toLocaleString()} GNF</td></tr>`;
+        gRecu += inT; gDepense += outT;
+        h += `<tr><td><b>${c.nom.toUpperCase()}</b></td><td>${c.client.toUpperCase()}</td><td>${inT.toLocaleString()}</td><td>${outT.toLocaleString()}</td><td><b>${(inT-outT).toLocaleString()}</b></td></tr>`;
     });
-    h += `</tbody>
-        </table>
-        <div class="total-box">TOTAL DÉJÀ PAYÉ : ${totalPaye.toLocaleString()} GNF</div>
-        <div class="total-box" style="margin-top:10px; border-color: #red; color: red;">RESTE À PAYER : ${(contrat - totalPaye).toLocaleString()} GNF</div>
-        <div style="margin-top: 50px; display: flex; justify-content: space-between;">
-            <div style="text-align:center; width: 200px; border-top: 1px solid #000;">Signature Ouvrier</div>
-            <div style="text-align:center; width: 200px; border-top: 1px solid #000;">Signature Gérant</div>
-        </div>
-    </div>`;
-    document.getElementById('printContent').innerHTML = h;
-    window.print();
+    h += `</tbody></table><div class="total-box">SOLDE GLOBAL : ${(gRecu-gDepense).toLocaleString()} GNF</div></div>`;
+    document.getElementById('printContent').innerHTML = h; window.print();
 }
 
 function exportData() {
-    const data = JSON.stringify({ db, config, logo: currentLogo });
-    const blob = new Blob([data], { type: 'application/json' });
+    const data = JSON.stringify({db, config, logo: currentLogo});
+    const blob = new Blob([data], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -532,29 +551,21 @@ function exportData() {
 
 function importData() {
     const file = document.getElementById('importFile').files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const data = JSON.parse(e.target.result);
-            if (data.db && data.config) {
-                db = data.db;
-                config = data.config;
-                if (data.logo) {
-                    currentLogo = data.logo;
-                    localStorage.setItem('EKELEC_LOGO', currentLogo);
-                    document.getElementById('logoPreview').src = currentLogo;
-                    document.getElementById('navLogo').src = currentLogo;
-                }
-                saveDB();
-                localStorage.setItem('PRO_CONFIG', JSON.stringify(config));
-                alert("DONNÉES IMPORTÉES AVEC SUCCÈS");
-                location.reload();
-            }
-        };
-        reader.readAsText(file);
-    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const data = JSON.parse(e.target.result);
+        db = data.db;
+        config = data.config;
+        if(data.logo) {
+            currentLogo = data.logo;
+            localStorage.setItem('EKELEC_LOGO', currentLogo);
+        }
+        saveDB();
+        localStorage.setItem('PRO_CONFIG', JSON.stringify(config));
+        location.reload();
+    };
+    reader.readAsText(file);
 }
 </script>
-
 </body>
 </html>
