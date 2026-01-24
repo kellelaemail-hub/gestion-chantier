@@ -13,22 +13,13 @@ body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
 input, select { background: #0f172a !important; border: 1px solid #475569 !important; color: white !important; padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 10px; outline: none; }
 .btn-gold { background: #f59e0b; color: black; font-weight: bold; text-transform: uppercase; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; transition: 0.3s; border:none; }
 .btn-gold:hover { background: #fbbf24; transform: translateY(-2px); }
-
 #logoPreview, #signPreview { max-width: 120px; max-height: 120px; margin: 0 auto 15px; display: block; object-fit: contain; }
-
 @media (max-width: 768px) {
     #viewProjet .glass.p-8 { position: relative; padding: 20px !important; }
     #chantierTitre { font-size: 1.5rem !important; line-height: 1.2 !important; margin-bottom: 10px !important; }
-    #viewProjet .absolute.right-8.top-8 { 
-        position: static !important; 
-        text-align: left !important; 
-        margin-top: 15px; 
-        padding-top: 15px;
-        border-top: 1px solid rgba(255,255,255,0.1);
-    }
+    #viewProjet .absolute.right-8.top-8 { position: static !important; text-align: left !important; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
     #soldeChantier { font-size: 1.8rem !important; }
 }
-
 #printArea { display: none; }
 @media print {
     @page { margin: 0.8cm; size: auto; }
@@ -110,11 +101,14 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
                 <div class="glass p-4 border-b-4 border-blue-500"><p class="text-[9px] uppercase font-black text-slate-400">Projets Actifs</p><p id="statTotalChantiers" class="text-2xl font-black text-white">0</p></div>
                 <div class="glass p-4 border-b-4 border-emerald-500"><p class="text-[9px] uppercase font-black text-slate-400">Total Reçu</p><p id="statTotalRecu" class="text-xl font-black text-emerald-400">0 GNF</p></div>
                 <div class="glass p-4 border-b-4 border-red-500"><p class="text-[9px] uppercase font-black text-slate-400">Total Dépensé</p><p id="statTotalDepense" class="text-xl font-black text-red-400">0 GNF</p></div>
-                <div class="glass p-4 border-b-4 border-amber-500"><p class="text-[9px] uppercase font-black text-slate-400">Solde Global</p><p id="statTotalSolde" class="text-xl font-black text-amber-500">0 GNF</p></div>
+                <div class="glass p-4 border-b-4 border-amber-500"><p class="text-[9px] uppercase font-black text-slate-400">Solde Comptes</p><p id="statTotalSoldeComptes" class="text-xl font-black text-amber-500">0 GNF</p></div>
             </div>
             <div class="flex justify-between items-center mb-6 gap-4">
                 <input type="text" id="searchHome" oninput="renderHome()" placeholder="Rechercher..." class="max-w-xs mb-0" autocomplete="off">
-                <button onclick="viderChantier(); openModal('modalChantier')" class="bg-amber-500 text-black px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg">+ Nouveau Projet</button>
+                <div class="flex gap-2">
+                    <button onclick="openFinances()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg flex items-center gap-2 transition hover:bg-blue-500"><i class="fa-solid fa-wallet"></i> Opérations</button>
+                    <button onclick="viderChantier(); openModal('modalChantier')" class="bg-amber-500 text-black px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg">+ Nouveau Projet</button>
+                </div>
             </div>
             
             <div id="listeChantiers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -157,9 +151,10 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
                     </div>
                 </div>
                 <div class="lg:col-span-3 glass overflow-hidden">
-                    <div class="overflow-x-auto"> <table class="w-full text-left text-[11px]">
+                    <div class="overflow-x-auto"> 
+                        <table class="w-full text-left text-[11px]">
                             <thead class="bg-slate-800 text-slate-400 font-black uppercase">
-                                <tr><th class="p-5">Opération</th><th class="p-5">Entrée</th><th class="p-5">Sortie</th><th class="p-5">Solde</th><th class="p-5 text-center">Gestion</th></tr>
+                                <tr><th class="p-5">Opération</th><th class="p-5">Compte</th><th class="p-5">Entrée</th><th class="p-5">Sortie</th><th class="p-5">Solde</th><th class="p-5 text-center">Gestion</th></tr>
                             </thead>
                             <tbody id="tableBody" class="divide-y divide-slate-700/50"></tbody>
                         </table>
@@ -167,6 +162,61 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div id="modalFinances" class="fixed inset-0 bg-black/95 hidden items-center justify-center p-4 z-[100] backdrop-blur-md">
+    <div class="glass p-8 w-full max-w-4xl border-t-[10px] border-blue-500 shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h3 class="font-black uppercase text-blue-400 italic text-xl">Gestion des Finances</h3>
+                <p class="text-[9px] font-black opacity-40 uppercase tracking-widest">Dépôts, Retraits et Soldes</p>
+            </div>
+            <div class="text-right">
+                <p class="text-[10px] font-black opacity-40 uppercase">Richesse Nette (Tous comptes)</p>
+                <p id="soldeGlobalFinances" class="text-2xl font-black text-amber-500">0 GNF</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-hidden">
+            <div class="md:col-span-1 space-y-4">
+                <div class="glass p-4 bg-slate-900/50">
+                    <h4 class="text-[10px] font-black uppercase text-slate-400 mb-4">Enregistrer un mouvement</h4>
+                    <input type="hidden" id="editOpIndex">
+                    <select id="opType" class="font-bold">
+                        <option value="DEPOT">DÉPÔT (+)</option>
+                        <option value="RETRAIT">RETRAIT (-)</option>
+                    </select>
+                    <select id="opCompte" class="font-bold border-blue-500/30 border">
+                        <option value="ORANGE MONEY">ORANGE MONEY</option>
+                        <option value="MOBILE MONEY">MOBILE MONEY</option>
+                        <option value="BANQUE">BANQUE</option>
+                        <option value="PAYCARD">PAYCARD</option>
+                        <option value="ESPECES">ESPÈCES</option>
+                        <option value="AUTRES">AUTRES</option>
+                    </select>
+                    <input type="text" id="opMotif" placeholder="Détail / Motif" autocomplete="off">
+                    <input type="text" id="opMontant" placeholder="Montant GNF" autocomplete="off">
+                    <input type="date" id="opDate">
+                    <button onclick="saveOperationFinanciere()" class="btn-gold w-full py-3 mt-2">Valider l'opération</button>
+                    <button onclick="viderFormOp()" class="w-full mt-2 text-[10px] opacity-40 uppercase font-black hover:opacity-100 transition">Vider / Annuler</button>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 flex flex-col space-y-4 overflow-hidden">
+                <div id="gridComptes" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    </div>
+                <div class="glass flex-1 flex flex-col overflow-hidden">
+                    <p class="p-3 bg-slate-800 text-[10px] font-black uppercase text-slate-400">Journal des opérations financières</p>
+                    <div class="overflow-y-auto flex-1">
+                        <table class="w-full text-left text-[10px]">
+                            <tbody id="tableOpsBody" class="divide-y divide-slate-700/50"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button onclick="closeModal('modalFinances')" class="mt-6 text-[10px] font-black uppercase text-slate-500 hover:text-white self-center">Fermer la fenêtre</button>
     </div>
 </div>
 
@@ -183,6 +233,17 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
     <div class="glass p-10 w-full max-w-md border-t-[10px] border-amber-500 shadow-2xl overflow-y-auto max-h-[90vh]">
         <h3 class="font-black mb-4 uppercase text-amber-500 italic text-xl">Saisie de Flux</h3>
         <input type="hidden" id="editIndex">
+        
+        <label class="text-[10px] font-black uppercase text-slate-400">Compte utilisé</label>
+        <select id="fCompte" class="font-bold border-amber-500/50 border mb-4">
+            <option value="ESPECES">ESPÈCES</option>
+            <option value="ORANGE MONEY">ORANGE MONEY</option>
+            <option value="MOBILE MONEY">MOBILE MONEY</option>
+            <option value="BANQUE">BANQUE</option>
+            <option value="PAYCARD">PAYCARD</option>
+            <option value="AUTRES">AUTRES</option>
+        </select>
+
         <label class="text-[10px] font-black uppercase text-slate-400">Type de saisie</label>
         <select id="typeSaisie" onchange="toggleForm()" class="font-bold">
             <option value="DIVERS">DIVERS (Caisse)</option>
@@ -190,6 +251,7 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
             <option value="OUVRIER">OUVRIER (Main d'œuvre)</option>
             <option value="LOCATION">LOCATION</option>
         </select>
+        
         <label class="text-[10px] font-black uppercase text-slate-400">Corps de métier / Catégorie</label>
         <select id="fCat" class="font-bold">
             <option value="GENERAL">Général / Divers</option>
@@ -253,6 +315,7 @@ function previewImage(input, type) {
 
 let db = JSON.parse(localStorage.getItem('PRO_DB_V9')) || [];
 let config = JSON.parse(localStorage.getItem('PRO_CONFIG')) || { code: "1234" };
+let financeDB = JSON.parse(localStorage.getItem('PRO_FINANCE_V1')) || [];
 let currentId = null;
 
 window.onload = () => {
@@ -263,7 +326,11 @@ window.onload = () => {
     }
 };
 
-function saveDB() { localStorage.setItem('PRO_DB_V9', JSON.stringify(db)); }
+function saveDB() { 
+    localStorage.setItem('PRO_DB_V9', JSON.stringify(db)); 
+    localStorage.setItem('PRO_FINANCE_V1', JSON.stringify(financeDB));
+}
+
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
 function goHome() { document.getElementById('viewAccueil').classList.remove('hidden'); document.getElementById('viewProjet').classList.add('hidden'); renderHome(); }
@@ -298,14 +365,6 @@ function toggleForm() {
 
 function openSaisie() { viderSaisie(); document.getElementById('fDate').valueAsDate = new Date(); openModal('modalSaisie'); }
 
-function ajouterAcompteRapide(nom, job, contrat) {
-    viderSaisie(); document.getElementById('typeSaisie').value = "OUVRIER"; toggleForm();
-    document.getElementById('fOuvNom').value = nom; document.getElementById('fOuvJob').value = job;
-    document.getElementById('fOuvC').value = contrat; document.getElementById('fDate').valueAsDate = new Date();
-    updateOuvrierInfo();
-    openModal('modalSaisie');
-}
-
 function updateOuvrierInfo() {
     const nom = document.getElementById('fOuvNom').value.trim().toUpperCase();
     const infoDiv = document.getElementById('infoOuvrierReliquat');
@@ -323,52 +382,17 @@ function updateOuvrierInfo() {
     } else { infoDiv.classList.add('hidden'); }
 }
 
-function toggleArchives() {
-    const div = document.getElementById('listeArchives');
-    const text = document.getElementById('archiveText');
-    const icon = document.getElementById('archiveIcon');
-    if(div.classList.contains('hidden')) {
-        div.classList.remove('hidden');
-        text.innerText = "Masquer les archives";
-        icon.classList.replace('fa-box-archive', 'fa-eye-slash');
-    } else {
-        div.classList.add('hidden');
-        text.innerText = "Afficher les archives";
-        icon.classList.replace('fa-eye-slash', 'fa-box-archive');
-    }
-}
-
-function archiveProject(e, i) {
-    e.stopPropagation();
-    if(confirm("Archiver ce projet ? Il sera déplacé vers la section Archives.")) {
-        db[i].archive = true;
-        saveDB(); renderHome();
-    }
-}
-
-function restoreProject(e, i) {
-    e.stopPropagation();
-    if(confirm("Restaurer ce projet vers les projets actifs ?")) {
-        db[i].archive = false;
-        saveDB(); renderHome();
-    }
-}
-
 function renderHome(){
     const div = document.getElementById('listeChantiers');
     const divArch = document.getElementById('listeArchives');
     const search = document.getElementById('searchHome').value.toLowerCase();
     div.innerHTML = ""; divArch.innerHTML = ""; 
     let gRecu = 0, gDepense = 0, activeCount = 0;
-
+    
     db.forEach((c,i)=>{
         let inT=0, outT=0; c.flux.forEach(f=>{ inT+=f.e; outT+=f.s; });
         let soldeP = inT - outT;
-        
-        if(!c.archive) {
-            gRecu += inT; gDepense += outT; activeCount++;
-        }
-
+        if(!c.archive) { gRecu += inT; gDepense += outT; activeCount++; }
         if(c.nom.toLowerCase().includes(search)){
             let html = `<div class="glass p-6 relative cursor-pointer border-b-4 border-transparent hover:border-amber-500" onclick="openProject(${i})">
                 <h3 class="text-xl font-black text-amber-500 uppercase italic">${c.nom}</h3>
@@ -378,24 +402,104 @@ function renderHome(){
                     <div class="flex justify-between text-[10px] font-black pt-1 border-t border-slate-700/50"><span>SOLDE:</span><span class="text-amber-500">${soldeP.toLocaleString()} GNF</span></div>
                 </div>
                 <div class="absolute top-4 right-4 flex gap-3">
-                    ${c.archive ? 
-                        `<button onclick="restoreProject(event, ${i})" title="Restaurer" class="text-emerald-400"><i class="fa-solid fa-rotate-left"></i></button>` : 
-                        `<button onclick="archiveProject(event, ${i})" title="Archiver" class="text-slate-500 hover:text-amber-500"><i class="fa-solid fa-box-archive"></i></button>`
-                    }
+                    ${c.archive ? `<button onclick="restoreProject(event, ${i})" title="Restaurer" class="text-emerald-400"><i class="fa-solid fa-rotate-left"></i></button>` : `<button onclick="archiveProject(event, ${i})" title="Archiver" class="text-slate-500 hover:text-amber-500"><i class="fa-solid fa-box-archive"></i></button>`}
                     <button onclick="editProject(event, ${i})" class="text-blue-400 hover:text-blue-300"><i class="fa-solid fa-pen"></i></button>
                     <button onclick="deleteProject(event, ${i})" class="text-slate-700 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>`;
-            
-            if(c.archive) divArch.innerHTML += html;
-            else div.innerHTML += html;
+            if(c.archive) divArch.innerHTML += html; else div.innerHTML += html;
         }
     });
+
+    let totalComptes = 0;
+    ["ORANGE MONEY", "MOBILE MONEY", "BANQUE", "PAYCARD", "ESPECES", "AUTRES"].forEach(nom => { totalComptes += getSoldeCompte(nom); });
+
     document.getElementById('statTotalChantiers').innerText = activeCount;
     document.getElementById('statTotalRecu').innerText = gRecu.toLocaleString() + " GNF";
     document.getElementById('statTotalDepense').innerText = gDepense.toLocaleString() + " GNF";
-    document.getElementById('statTotalSolde').innerText = (gRecu-gDepense).toLocaleString() + " GNF";
+    document.getElementById('statTotalSoldeComptes').innerText = totalComptes.toLocaleString() + " GNF";
+    document.getElementById('statTotalSoldeComptes').className = totalComptes < 0 ? "text-xl font-black text-red-500" : "text-xl font-black text-amber-500";
 }
+
+// --- LOGIQUE FINANCES ---
+
+function openFinances() {
+    viderFormOp();
+    document.getElementById('opDate').valueAsDate = new Date();
+    renderFinances();
+    openModal('modalFinances');
+}
+
+function getSoldeCompte(nomCompte) {
+    let solde = 0;
+    db.forEach(c => { c.flux.forEach(f => { if(f.compte === nomCompte) solde += (f.e - f.s); }); });
+    financeDB.forEach(op => { if(op.compte === nomCompte) solde += (op.type === 'DEPOT' ? op.montant : -op.montant); });
+    return solde;
+}
+
+function renderFinances() {
+    const grid = document.getElementById('gridComptes');
+    const table = document.getElementById('tableOpsBody');
+    grid.innerHTML = ""; table.innerHTML = "";
+    const comptes = ["ORANGE MONEY", "MOBILE MONEY", "BANQUE", "PAYCARD", "ESPECES", "AUTRES"];
+    let totalGlobal = 0;
+    comptes.forEach(nom => {
+        const s = getSoldeCompte(nom);
+        totalGlobal += s;
+        grid.innerHTML += `<div class="glass p-3 bg-slate-800/50 border-l-4 ${s < 0 ? 'border-red-500' : 'border-emerald-500'}">
+            <p class="text-[8px] font-black uppercase opacity-50">${nom}</p>
+            <p class="text-[11px] font-black ${s < 0 ? 'text-red-400' : 'text-white'}">${s.toLocaleString()} GNF</p>
+        </div>`;
+    });
+    document.getElementById('soldeGlobalFinances').innerText = totalGlobal.toLocaleString() + " GNF";
+    document.getElementById('soldeGlobalFinances').className = totalGlobal < 0 ? "text-2xl font-black text-red-500" : "text-2xl font-black text-amber-500";
+    financeDB.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach((op, idx) => {
+        table.innerHTML += `<tr class="border-b border-slate-700/30">
+            <td class="p-3"><span class="font-black uppercase block">${op.compte}</span><span class="opacity-40 text-[8px]">${op.date}</span></td>
+            <td class="p-3 opacity-70">${op.motif}</td>
+            <td class="p-3 font-black ${op.type === 'DEPOT' ? 'text-emerald-400' : 'text-red-400'}">${op.type === 'DEPOT' ? '+' : '-'}${op.montant.toLocaleString()}</td>
+            <td class="p-3 text-right">
+                <button onclick="editOperation(${idx})" class="text-blue-400 mr-2"><i class="fa-solid fa-pen"></i></button>
+                <button onclick="deleteOperation(${idx})" class="text-slate-600"><i class="fa-solid fa-trash"></i></button>
+            </td>
+        </tr>`;
+    });
+}
+
+function saveOperationFinanciere() {
+    const idx = document.getElementById('editOpIndex').value;
+    const op = {
+        type: document.getElementById('opType').value,
+        compte: document.getElementById('opCompte').value,
+        motif: document.getElementById('opMotif').value || "Mouvement direct",
+        montant: parseNum(document.getElementById('opMontant').value),
+        date: document.getElementById('opDate').value
+    };
+    if(op.montant <= 0) return alert("Montant invalide");
+    if(idx !== "") financeDB[idx] = op; else financeDB.push(op);
+    saveDB(); renderFinances(); renderHome(); viderFormOp();
+}
+
+function editOperation(idx) {
+    const op = financeDB[idx];
+    document.getElementById('editOpIndex').value = idx;
+    document.getElementById('opType').value = op.type;
+    document.getElementById('opCompte').value = op.compte;
+    document.getElementById('opMotif').value = op.motif;
+    document.getElementById('opMontant').value = op.montant;
+    document.getElementById('opDate').value = op.date;
+}
+
+function deleteOperation(idx) { if(confirm("Supprimer cette opération ?")) { financeDB.splice(idx, 1); saveDB(); renderFinances(); renderHome(); } }
+
+function viderFormOp() {
+    document.getElementById('editOpIndex').value = "";
+    document.getElementById('opMotif').value = "";
+    document.getElementById('opMontant').value = "";
+    document.getElementById('opDate').valueAsDate = new Date();
+}
+
+// --- FIN LOGIQUE FINANCES ---
 
 function renderJournal(){
     const c = db[currentId]; const tbody = document.getElementById('tableBody'); 
@@ -420,7 +524,17 @@ function renderJournal(){
             if(!workers[f.on]) workers[f.on]={job:f.oj, contrat:f.oc, paye:0};
             workers[f.on].paye += f.s;
         }
-        tbody.innerHTML += `<tr><td class="p-5 font-bold uppercase">${f.txt}<br><span class="opacity-30 text-[9px] mr-2">${f.date}</span> <span class="text-[8px] font-black bg-slate-700 px-2 py-0.5 rounded text-amber-500">${f.cat || 'GENERAL'}</span></td><td class="p-5 text-emerald-400 font-black">${f.e>0?f.e.toLocaleString():'-'}</td><td class="p-5 text-red-400 font-black">${f.s>0?f.s.toLocaleString():'-'}</td><td class="p-5 font-black text-white">${runningSolde.toLocaleString()}</td><td class="p-5 text-center flex gap-4 justify-center"><button onclick="editEntry(${idx})" class="text-blue-400"><i class="fa-solid fa-pen"></i></button><button onclick="deleteEntry(${idx})" class="text-slate-600 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+        tbody.innerHTML += `<tr>
+            <td class="p-5 font-bold uppercase">${f.txt}<br><span class="opacity-30 text-[9px] mr-2">${f.date}</span> <span class="text-[8px] font-black bg-slate-700 px-2 py-0.5 rounded text-amber-500">${f.cat || 'GENERAL'}</span></td>
+            <td class="p-5 font-black opacity-60 text-[10px] uppercase">${f.compte || 'ESPECES'}</td>
+            <td class="p-5 text-emerald-400 font-black">${f.e>0?f.e.toLocaleString():'-'}</td>
+            <td class="p-5 text-red-400 font-black">${f.s>0?f.s.toLocaleString():'-'}</td>
+            <td class="p-5 font-black text-white">${runningSolde.toLocaleString()}</td>
+            <td class="p-5 text-center flex gap-4 justify-center">
+                <button onclick="editEntry(${idx})" class="text-blue-400"><i class="fa-solid fa-pen"></i></button>
+                <button onclick="deleteEntry(${idx})" class="text-slate-600 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+            </td>
+        </tr>`;
     });
     for(let k in cats) { if(cats[k] > 0) divBilan.innerHTML += `<div class="flex justify-between border-b border-slate-700 pb-1"><span>${k}</span><span class="text-slate-300">${cats[k].toLocaleString()} GNF</span></div>`; }
     for(let it in items) { divInv.innerHTML += `<div class="flex justify-between border-b border-slate-700 pb-1"><span>${it}</span><span class="text-emerald-400">x ${items[it]}</span></div>`; }
@@ -436,12 +550,22 @@ function renderJournal(){
     }
 }
 
+function ajouterAcompteRapide(nom, job, contrat) {
+    viderSaisie();
+    document.getElementById('typeSaisie').value = "OUVRIER"; toggleForm();
+    document.getElementById('fOuvNom').value = nom; document.getElementById('fOuvJob').value = job;
+    document.getElementById('fOuvC').value = contrat; document.getElementById('fDate').valueAsDate = new Date();
+    updateOuvrierInfo();
+    openModal('modalSaisie');
+}
+
 function parseNum(v) { if(!v) return 0; return parseFloat(String(v).replace(',', '.')) || 0; }
 
 function editEntry(idx) {
     const f = db[currentId].flux[idx];
     document.getElementById('editIndex').value = idx;
     document.getElementById('typeSaisie').value = f.type;
+    document.getElementById('fCompte').value = f.compte || "ESPECES";
     toggleForm();
     document.getElementById('fDate').value = f.date;
     document.getElementById('fCat').value = f.cat || "GENERAL";
@@ -457,20 +581,24 @@ function editEntry(idx) {
 }
 
 function saveEntry(keepOpen) {
-    const idx = document.getElementById('editIndex').value; 
+    const idx = document.getElementById('editIndex').value;
     const type = document.getElementById('typeSaisie').value;
-    let entry = { type: type, date: document.getElementById('fDate').value, cat: document.getElementById('fCat').value, e: 0, s: 0, txt: "", oc: 0, on: "", oj: "", locBat: "", locMois: "" };
-    if(type === 'DIVERS') { 
-        entry.e = parseNum(document.getElementById('fE').value); entry.s = parseNum(document.getElementById('fS').value); entry.txt = document.getElementById('fMotif').value || "Divers"; 
-    }
+    let entry = { 
+        type: type, 
+        date: document.getElementById('fDate').value, 
+        cat: document.getElementById('fCat').value, 
+        compte: document.getElementById('fCompte').value,
+        e: 0, s: 0, txt: "", oc: 0, on: "", oj: "", locBat: "", locMois: "" 
+    };
+    if(type === 'DIVERS') { entry.e = parseNum(document.getElementById('fE').value); entry.s = parseNum(document.getElementById('fS').value); entry.txt = document.getElementById('fMotif').value || "Divers"; }
     else if(type === 'ARTICLE') { 
-        let p = parseNum(document.getElementById('fArtP').value), q = parseNum(document.getElementById('fArtQ').value); 
-        let nomArt = document.getElementById('fArtNom').value; entry.s = p * q; entry.txt = `ARTICLE : ${nomArt.toUpperCase()} (x${q})`; 
+        let p = parseNum(document.getElementById('fArtP').value), q = parseNum(document.getElementById('fArtQ').value);
+        let nomArt = document.getElementById('fArtNom').value; entry.s = p * q; entry.txt = `ARTICLE : ${nomArt.toUpperCase()} (x${q})`;
     }
     else if(type === 'OUVRIER') { 
         entry.on = document.getElementById('fOuvNom').value.trim(); entry.oj = document.getElementById('fOuvJob').value; 
         entry.oc = parseNum(document.getElementById('fOuvC').value); entry.s = parseNum(document.getElementById('fOuvA').value); 
-        entry.txt = `PAYE : ${entry.on.toUpperCase()}`; 
+        entry.txt = `PAYE : ${entry.on.toUpperCase()}`;
     }
     else if(type === 'LOCATION') {
         const nom = document.getElementById('fLocNom').value.toUpperCase(); const bat = document.getElementById('fLocBat').value;
@@ -478,36 +606,25 @@ function saveEntry(keepOpen) {
         entry.locBat = bat; entry.locMois = mois; entry.txt = `LOCATION : ${nom} (BAT: ${bat}) - MOIS: ${mois}`;
     }
     if(idx !== "") db[currentId].flux[idx] = entry; else db[currentId].flux.push(entry);
-    saveDB(); renderJournal(); viderSaisie(); if(!keepOpen) closeModal('modalSaisie');
+    saveDB(); renderJournal(); renderHome(); viderSaisie(); if(!keepOpen) closeModal('modalSaisie');
 }
 
-function viderSaisie() { document.querySelectorAll('#modalSaisie input').forEach(i => i.value = ""); document.getElementById('editIndex').value = ""; document.getElementById('fCat').value = "GENERAL"; document.getElementById('typeSaisie').value = "DIVERS"; toggleForm(); }
-function deleteEntry(idx) { if(confirm("Supprimer cette ligne ?")) { db[currentId].flux.splice(idx, 1); saveDB(); renderJournal(); } }
+function viderSaisie() { document.querySelectorAll('#modalSaisie input').forEach(i => i.value = ""); document.getElementById('editIndex').value = ""; document.getElementById('fCat').value = "GENERAL"; document.getElementById('typeSaisie').value = "DIVERS"; document.getElementById('fCompte').value = "ESPECES"; toggleForm(); }
+function deleteEntry(idx) { if(confirm("Supprimer cette ligne ?")) { db[currentId].flux.splice(idx, 1); saveDB(); renderJournal(); renderHome(); } }
 function viderChantier() { document.getElementById('cNom').value = ""; document.getElementById('cLieu').value = ""; document.getElementById('cClient').value = ""; document.getElementById('editChantierIndex').value = ""; document.getElementById('chantierModalTitre').innerText = "Nouveau Projet"; document.getElementById('btnCreateChantier').innerText = "CRÉER"; }
 
-function editProject(e, i) {
-    e.stopPropagation(); const c = db[i]; document.getElementById('editChantierIndex').value = i;
-    document.getElementById('cNom').value = c.nom; document.getElementById('cLieu').value = c.lieu; document.getElementById('cClient').value = c.client;
-    document.getElementById('chantierModalTitre').innerText = "Modifier Projet"; document.getElementById('btnCreateChantier').innerText = "METTRE À JOUR"; openModal('modalChantier');
-}
+function editProject(e, i) { e.stopPropagation(); const c = db[i]; document.getElementById('editChantierIndex').value = i; document.getElementById('cNom').value = c.nom; document.getElementById('cLieu').value = c.lieu; document.getElementById('cClient').value = c.client; document.getElementById('chantierModalTitre').innerText = "Modifier Projet"; document.getElementById('btnCreateChantier').innerText = "METTRE À JOUR"; openModal('modalChantier'); }
+function createChantier() { const n = document.getElementById('cNom').value.trim(); const idx = document.getElementById('editChantierIndex').value; if(n) { if(idx !== "") { db[idx].nom = n; db[idx].lieu = document.getElementById('cLieu').value; db[idx].client = document.getElementById('cClient').value; } else { db.push({ nom: n, lieu: document.getElementById('cLieu').value, client: document.getElementById('cClient').value, flux: [], archive: false }); } saveDB(); viderChantier(); closeModal('modalChantier'); renderHome(); } }
+function deleteProject(e, i) { e.stopPropagation(); const codeCheck = prompt("SÉCURITÉ : Entrez le CODE ACCÈS pour supprimer ce projet :"); if(codeCheck === config.code) { if(confirm("Confirmer définitivement la suppression ?")) { db.splice(i,1); saveDB(); renderHome(); } } }
 
-function createChantier() { 
-    const n = document.getElementById('cNom').value.trim(); const idx = document.getElementById('editChantierIndex').value;
-    if(n) { 
-        if(idx !== "") { db[idx].nom = n; db[idx].lieu = document.getElementById('cLieu').value; db[idx].client = document.getElementById('cClient').value; }
-        else { db.push({ nom: n, lieu: document.getElementById('cLieu').value, client: document.getElementById('cClient').value, flux: [], archive: false }); }
-        saveDB(); viderChantier(); closeModal('modalChantier'); renderHome(); 
-    } 
-}
-
-function deleteProject(e, i) { 
-    e.stopPropagation(); const codeCheck = prompt("SÉCURITÉ : Entrez le CODE ACCÈS pour supprimer ce projet :");
-    if(codeCheck === config.code) { if(confirm("Confirmer définitivement la suppression ?")) { db.splice(i,1); saveDB(); renderHome(); } }
-}
+function archiveProject(e, i) { e.stopPropagation(); if(confirm("Archiver ce projet ?")) { db[i].archive = true; saveDB(); renderHome(); } }
+function restoreProject(e, i) { e.stopPropagation(); if(confirm("Restaurer ce projet ?")) { db[i].archive = false; saveDB(); renderHome(); } }
+function toggleArchives() { const div = document.getElementById('listeArchives'); const text = document.getElementById('archiveText'); const icon = document.getElementById('archiveIcon'); if(div.classList.contains('hidden')) { div.classList.remove('hidden'); text.innerText = "Masquer les archives"; icon.classList.replace('fa-box-archive', 'fa-eye-slash'); } else { div.classList.add('hidden'); text.innerText = "Afficher les archives"; icon.classList.replace('fa-eye-slash', 'fa-box-archive'); } }
 
 function printReport() { 
-    const c = db[currentId]; let ti = 0, to = 0, soldeCaisse = 0; let ouvriersSuivi = {}; 
-    const gerant = document.getElementById('userGerant').value.toUpperCase(); 
+    const c = db[currentId];
+    let ti = 0, to = 0, soldeCaisse = 0; let ouvriersSuivi = {}; 
+    const gerant = document.getElementById('userGerant').value.toUpperCase();
     let h = `<div style="padding:30px; background:#fff; color:#000"><div class="report-header"><div class="info-block"><h1 class="report-title">RAPPORT D'ACTIVITÉ ${c.archive ? '(ARCHIVÉ)' : ''}</h1><span class="info-line">PROJET : <b>${c.nom.toUpperCase()}</b></span><span class="info-line">CLIENT : <b>${c.client.toUpperCase() || 'N/A'}</b></span></div><div class="info-block" style="text-align:right;"><span class="info-line">LIEU : <b>${c.lieu.toUpperCase() || 'N/A'}</b></span><span class="info-line">GÉRANT : <b>${gerant}</b></span><span class="info-line">DATE : <b>${new Date().toLocaleDateString()}</b></span></div></div><table><thead><tr><th>DATE</th><th>LIBELLÉ (CATÉGORIE)</th><th>ENTRÉE</th><th>SORTIE</th><th>SOLDE</th></tr></thead><tbody>`; 
     c.flux.forEach((f) => { 
         ti += f.e; to += f.s; soldeCaisse += (f.e - f.s); 
@@ -515,46 +632,47 @@ function printReport() {
         let sortieTxt = f.s > 0 ? f.s.toLocaleString() : '-'; 
         if(f.type === 'OUVRIER') { if(!ouvriersSuivi[f.on]) ouvriersSuivi[f.on] = 0; ouvriersSuivi[f.on] += f.s; sortieTxt = `<b>${f.s.toLocaleString()}</b> <span style="font-size:8px">(Reste: ${(f.oc - ouvriersSuivi[f.on]).toLocaleString()})</span>`; } 
         h += `<tr class="${rowClass}"><td>${f.date}</td><td><b>${f.txt}</b> <span class="cat-badge">${f.cat || 'GENERAL'}</span></td><td style="text-align:right">${f.e>0?f.e.toLocaleString():'-'}</td><td style="text-align:right">${sortieTxt}</td><td style="text-align:right; background:#f8fafc"><b>${soldeCaisse.toLocaleString()}</b></td></tr>`; 
-    }); 
-    h += `</tbody></table><div class="total-box total-depense-rouge">TOTAL DÉPENSÉ : ${to.toLocaleString()} GNF</div><div class="total-box">SOLDE NET EN CAISSE : ${(ti-to).toLocaleString()} GNF</div><div class="signature-area"><p style="font-size:10px; margin-bottom:5px;">Cachet & Signature :</p><img src="${currentSign}"></div></div>`; 
+    });
+    h += `</tbody></table><div class="total-box total-depense-rouge">TOTAL DÉPENSÉ : ${to.toLocaleString()} GNF</div><div class="total-box">SOLDE NET EN CAISSE : ${(ti-to).toLocaleString()} GNF</div><div class="signature-area"><p style="font-size:10px; margin-bottom:5px;">Cachet & Signature :</p><img src="${currentSign}"></div></div>`;
     document.getElementById('printContent').innerHTML = h; window.print(); 
 }
 
 function printRecu(nomOuvrier) {
-    const c = db[currentId]; let payeTotal = 0, contrat = 0, métier = "", history = "";
+    const c = db[currentId];
+    let payeTotal = 0, contrat = 0, métier = "", history = "";
     c.flux.forEach(f => { if(f.type === 'OUVRIER' && f.on === nomOuvrier) { payeTotal += f.s; contrat = f.oc; métier = f.oj; history += `<tr><td>${f.date}</td><td>Acompte / Paiement</td><td style="text-align:right">${f.s.toLocaleString()} GNF</td></tr>`; } });
     let h = `<div style="padding:40px; color:#000; background:#fff; font-family:sans-serif;"><div class="report-header"><div><h1 class="report-title">REÇU DE PAIEMENT</h1><p class="recu-ouvrier-title">OUVRIER : <b>${nomOuvrier.toUpperCase()}</b></p></div><div style="text-align:right"><p class="info-line">DATE : ${new Date().toLocaleDateString()}</p></div></div><div style="margin-bottom:20px;"><p class="info-line">PROJET : <b>${c.nom.toUpperCase()}</b></p><p class="info-line">MÉTIER : <b>${métier.toUpperCase()}</b></p><p class="info-line">MONTANT CONTRAT : <b>${contrat.toLocaleString()} GNF</b></p></div><table><thead><tr><th>DATE</th><th>DESCRIPTION</th><th>MONTANT</th></tr></thead><tbody>${history}</tbody></table><div class="total-box">TOTAL PAYÉ : ${payeTotal.toLocaleString()} GNF</div><div class="total-box ${contrat-payeTotal > 0 ? 'total-depense-rouge' : ''}">RESTE À PAYER : ${(contrat-payeTotal).toLocaleString()} GNF</div><div class="signature-area"><img src="${currentSign}"></div></div>`;
     document.getElementById('printContent').innerHTML = h; window.print();
 }
 
 function printGlobalReport() { 
-    let gRecu = 0, gDepense = 0; const gerant = document.getElementById('userGerant').value.toUpperCase(); 
-    let h = `<div style="padding:30px; color:#000; background:#fff"><div class="report-header"><div><h1 class="report-title">BILAN GÉNÉRAL</h1><p class="info-line">GÉRANT : <b>${gerant}</b></p></div><div style="text-align:right"><p class="info-line">DATE : ${new Date().toLocaleDateString()}</p></div></div><table><thead><tr><th>CHANTIER</th><th>CLIENT</th><th style="text-align:right">REÇU</th><th style="text-align:right">DÉPENSÉ</th><th style="text-align:right">SOLDE</th></tr></thead><tbody>`; 
-    db.forEach(c => { 
-        if(!c.archive) {
-            let inT=0, outT=0; c.flux.forEach(f=>{ inT+=f.e; outT+=f.s; }); gRecu += inT; gDepense += outT; 
-            h += `<tr><td><b>${c.nom.toUpperCase()}</b></td><td>${c.client.toUpperCase()}</td><td style="text-align:right">${inT.toLocaleString()}</td><td style="text-align:right">${outT.toLocaleString()}</td><td style="text-align:right"><b>${(inT-outT).toLocaleString()}</b></td></tr>`;
-        }
-    });
+    let gRecu = 0, gDepense = 0;
+    const gerant = document.getElementById('userGerant').value.toUpperCase(); 
+    let h = `<div style="padding:30px; color:#000; background:#fff"><div class="report-header"><div><h1 class="report-title">BILAN GÉNÉRAL</h1><p class="info-line">GÉRANT : <b>${gerant}</b></p></div><div style="text-align:right"><p class="info-line">DATE : ${new Date().toLocaleDateString()}</p></div></div><table><thead><tr><th>CHANTIER</th><th>CLIENT</th><th style="text-align:right">REÇU</th><th style="text-align:right">DÉPENSÉ</th><th style="text-align:right">SOLDE</th></tr></thead><tbody>`;
+    db.forEach(c => { if(!c.archive) { let inT=0, outT=0; c.flux.forEach(f=>{ inT+=f.e; outT+=f.s; }); gRecu += inT; gDepense += outT; h += `<tr><td><b>${c.nom.toUpperCase()}</b></td><td>${c.client.toUpperCase()}</td><td style="text-align:right">${inT.toLocaleString()}</td><td style="text-align:right">${outT.toLocaleString()}</td><td style="text-align:right"><b>${(inT-outT).toLocaleString()}</b></td></tr>`; } });
     h += `</tbody></table><div class="total-box">SOLDE GLOBAL (PROJETS ACTIFS) : ${(gRecu-gDepense).toLocaleString()} GNF</div><div class="signature-area"><img src="${currentSign}"></div></div>`;
     document.getElementById('printContent').innerHTML = h; window.print();
 }
 
 function exportData() {
-    const data = JSON.stringify({db, config, logo: currentLogo, sign: currentSign}); const blob = new Blob([data], {type: 'application/json'});
-    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `EKELEC_SAVE_${new Date().toISOString().split('T')[0]}.json`; a.click();
+    const data = JSON.stringify({db, config, logo: currentLogo, sign: currentSign, financeDB});
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url;
+    a.download = `EKELEC_SAVE_${new Date().toISOString().split('T')[0]}.json`; a.click();
 }
 
 function copyDataText() {
-    const data = JSON.stringify({db, config, logo: currentLogo, sign: currentSign});
+    const data = JSON.stringify({db, config, logo: currentLogo, sign: currentSign, financeDB});
     navigator.clipboard.writeText(data).then(() => { alert("DONNÉES COPIÉES !"); });
 }
 
 function importData() {
-    if(!confirm("ATTENTION : Importer un fichier va EFFACER vos données actuelles. Confirmer ?")) return;
+    if(!confirm("ATTENTION : Importer va EFFACER vos données actuelles. Confirmer ?")) return;
     const file = document.getElementById('importFile').files[0]; const reader = new FileReader();
     reader.onload = function(e) { 
-        const data = JSON.parse(e.target.result); db = data.db; config = data.config; 
+        const data = JSON.parse(e.target.result);
+        db = data.db; config = data.config; 
+        if(data.financeDB) financeDB = data.financeDB;
         if(data.logo) { currentLogo = data.logo; localStorage.setItem('EKELEC_LOGO', currentLogo); }
         if(data.sign) { currentSign = data.sign; localStorage.setItem('EKELEC_SIGN', currentSign); }
         saveDB(); location.reload(); 
