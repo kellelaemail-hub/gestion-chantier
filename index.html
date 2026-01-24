@@ -14,7 +14,7 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
 .btn-gold { background: #f59e0b; color: black; font-weight: bold; text-transform: uppercase; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; transition: 0.3s; border:none; }
 .btn-gold:hover { background: #fbbf24; transform: translateY(-2px); }
 
-#logoPreview { max-width: 120px; max-height: 120px; margin: 0 auto 15px; display: block; object-fit: contain; }
+#logoPreview, #signPreview { max-width: 120px; max-height: 120px; margin: 0 auto 15px; display: block; object-fit: contain; }
 
 @media (max-width: 768px) {
     #viewProjet .glass.p-8 { position: relative; padding: 20px !important; }
@@ -48,6 +48,8 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
     .total-box { border: 2px solid #000; padding: 8px; margin-top: 4px; text-align: right; font-size: 13px; font-weight: 900; background: #f8fafc !important; color: #000 !important; }
     .total-depense-rouge { color: #dc2626 !important; border-color: #dc2626 !important; }
     .cat-badge { font-size: 8px; text-transform: uppercase; background: #eee; padding: 2px 4px; border-radius: 3px; color: #666; font-weight: bold; }
+    .signature-area { margin-top: 20px; text-align: right; }
+    .signature-area img { max-width: 150px; display: inline-block; }
 }
 </style>
 </head>
@@ -55,11 +57,20 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
 
 <div id="loginPage" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950">
     <div class="glass p-10 w-full max-w-md text-center shadow-2xl">
-        <img id="logoPreview" src="https://via.placeholder.com/120?text=LOGO" alt="Logo">
-        <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-[10px] px-3 py-1 rounded mb-6 inline-block font-black uppercase">
-            <i class="fa-solid fa-image mr-1"></i> Changer le logo
-            <input type="file" id="logoInput" class="hidden" accept="image/*" onchange="previewImage(this)">
-        </label>
+        <div class="flex justify-center gap-4 mb-4">
+            <div>
+                <img id="logoPreview" src="https://via.placeholder.com/120?text=LOGO" alt="Logo">
+                <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-[9px] px-2 py-1 rounded font-black uppercase">
+                    Logo <input type="file" id="logoInput" class="hidden" accept="image/*" onchange="previewImage(this, 'logo')">
+                </label>
+            </div>
+            <div>
+                <img id="signPreview" src="https://via.placeholder.com/120?text=CACHET" alt="Cachet">
+                <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-[9px] px-2 py-1 rounded font-black uppercase">
+                    Cachet <input type="file" id="signInput" class="hidden" accept="image/*" onchange="previewImage(this, 'sign')">
+                </label>
+            </div>
+        </div>
         <h1 class="text-4xl font-black text-amber-500 mb-6 italic uppercase tracking-tighter">EKELEC</h1>
         <p class="text-[10px] text-slate-400 uppercase font-black mb-4 tracking-[3px]">Accès Gestionnaire</p>
         <input type="text" id="userGerant" value="EKELEC" class="text-center mb-2 uppercase font-bold border-amber-500/30" autocomplete="off">
@@ -216,17 +227,25 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
 
 <script>
 let currentLogo = localStorage.getItem('EKELEC_LOGO') || "https://via.placeholder.com/120?text=LOGO";
+let currentSign = localStorage.getItem('EKELEC_SIGN') || "https://via.placeholder.com/120?text=CACHET";
 document.getElementById('logoPreview').src = currentLogo;
 document.getElementById('navLogo').src = currentLogo; 
+document.getElementById('signPreview').src = currentSign;
 
-function previewImage(input) {
+function previewImage(input, type) {
     if (input.files && input.files[0]) {
         let reader = new FileReader();
         reader.onload = function(e) {
-            currentLogo = e.target.result;
-            document.getElementById('logoPreview').src = currentLogo;
-            document.getElementById('navLogo').src = currentLogo;
-            localStorage.setItem('EKELEC_LOGO', currentLogo);
+            if(type === 'logo') {
+                currentLogo = e.target.result;
+                document.getElementById('logoPreview').src = currentLogo;
+                document.getElementById('navLogo').src = currentLogo;
+                localStorage.setItem('EKELEC_LOGO', currentLogo);
+            } else {
+                currentSign = e.target.result;
+                document.getElementById('signPreview').src = currentSign;
+                localStorage.setItem('EKELEC_SIGN', currentSign);
+            }
         };
         reader.readAsDataURL(input.files[0]);
     }
@@ -443,27 +462,23 @@ function saveEntry(keepOpen) {
     let entry = { type: type, date: document.getElementById('fDate').value, cat: document.getElementById('fCat').value, e: 0, s: 0, txt: "", oc: 0, on: "", oj: "", locBat: "", locMois: "" };
     if(type === 'DIVERS') { 
         entry.e = parseNum(document.getElementById('fE').value); entry.s = parseNum(document.getElementById('fS').value); entry.txt = document.getElementById('fMotif').value || "Divers"; 
-        if(entry.e === 0 && entry.s === 0 && entry.txt === "Divers") { alert("SAISIE VIDE !"); return; }
     }
     else if(type === 'ARTICLE') { 
         let p = parseNum(document.getElementById('fArtP').value), q = parseNum(document.getElementById('fArtQ').value); 
-        let nomArt = document.getElementById('fArtNom').value; if(!nomArt || (p*q === 0)) { alert("NOM OU PRIX MANQUANT !"); return; }
-        entry.s = p * q; entry.txt = `ARTICLE : ${nomArt.toUpperCase()} (x${q})`; 
+        let nomArt = document.getElementById('fArtNom').value; entry.s = p * q; entry.txt = `ARTICLE : ${nomArt.toUpperCase()} (x${q})`; 
     }
     else if(type === 'OUVRIER') { 
         entry.on = document.getElementById('fOuvNom').value.trim(); entry.oj = document.getElementById('fOuvJob').value; 
         entry.oc = parseNum(document.getElementById('fOuvC').value); entry.s = parseNum(document.getElementById('fOuvA').value); 
-        if(!entry.on) { alert("NOM OUVRIER MANQUANT !"); return; }
         entry.txt = `PAYE : ${entry.on.toUpperCase()}`; 
     }
     else if(type === 'LOCATION') {
         const nom = document.getElementById('fLocNom').value.toUpperCase(); const bat = document.getElementById('fLocBat').value;
         const mois = document.getElementById('fLocMois').value; entry.e = parseNum(document.getElementById('fLocRecu').value); entry.s = parseNum(document.getElementById('fLocPaye').value);
-        if(!nom || (entry.e === 0 && entry.s === 0)) { alert("NOM OU MONTANT MANQUANT !"); return; }
         entry.locBat = bat; entry.locMois = mois; entry.txt = `LOCATION : ${nom} (BAT: ${bat}) - MOIS: ${mois}`;
     }
     if(idx !== "") db[currentId].flux[idx] = entry; else db[currentId].flux.push(entry);
-    saveDB(); renderJournal(); viderSaisie(); document.getElementById('fDate').valueAsDate = new Date(); if(!keepOpen) closeModal('modalSaisie');
+    saveDB(); renderJournal(); viderSaisie(); if(!keepOpen) closeModal('modalSaisie');
 }
 
 function viderSaisie() { document.querySelectorAll('#modalSaisie input').forEach(i => i.value = ""); document.getElementById('editIndex').value = ""; document.getElementById('fCat').value = "GENERAL"; document.getElementById('typeSaisie').value = "DIVERS"; toggleForm(); }
@@ -479,8 +494,6 @@ function editProject(e, i) {
 function createChantier() { 
     const n = document.getElementById('cNom').value.trim(); const idx = document.getElementById('editChantierIndex').value;
     if(n) { 
-        const exists = db.some((proj, i) => proj.nom.toUpperCase() === n.toUpperCase() && i != idx);
-        if(exists) { alert("ERREUR : Un projet porte déjà ce nom !"); return; }
         if(idx !== "") { db[idx].nom = n; db[idx].lieu = document.getElementById('cLieu').value; db[idx].client = document.getElementById('cClient').value; }
         else { db.push({ nom: n, lieu: document.getElementById('cLieu').value, client: document.getElementById('cClient').value, flux: [], archive: false }); }
         saveDB(); viderChantier(); closeModal('modalChantier'); renderHome(); 
@@ -503,14 +516,14 @@ function printReport() {
         if(f.type === 'OUVRIER') { if(!ouvriersSuivi[f.on]) ouvriersSuivi[f.on] = 0; ouvriersSuivi[f.on] += f.s; sortieTxt = `<b>${f.s.toLocaleString()}</b> <span style="font-size:8px">(Reste: ${(f.oc - ouvriersSuivi[f.on]).toLocaleString()})</span>`; } 
         h += `<tr class="${rowClass}"><td>${f.date}</td><td><b>${f.txt}</b> <span class="cat-badge">${f.cat || 'GENERAL'}</span></td><td style="text-align:right">${f.e>0?f.e.toLocaleString():'-'}</td><td style="text-align:right">${sortieTxt}</td><td style="text-align:right; background:#f8fafc"><b>${soldeCaisse.toLocaleString()}</b></td></tr>`; 
     }); 
-    h += `</tbody></table><div class="total-box total-depense-rouge">TOTAL DÉPENSÉ : ${to.toLocaleString()} GNF</div><div class="total-box">SOLDE NET EN CAISSE : ${(ti-to).toLocaleString()} GNF</div></div>`; 
+    h += `</tbody></table><div class="total-box total-depense-rouge">TOTAL DÉPENSÉ : ${to.toLocaleString()} GNF</div><div class="total-box">SOLDE NET EN CAISSE : ${(ti-to).toLocaleString()} GNF</div><div class="signature-area"><p style="font-size:10px; margin-bottom:5px;">Cachet & Signature :</p><img src="${currentSign}"></div></div>`; 
     document.getElementById('printContent').innerHTML = h; window.print(); 
 }
 
 function printRecu(nomOuvrier) {
     const c = db[currentId]; let payeTotal = 0, contrat = 0, métier = "", history = "";
     c.flux.forEach(f => { if(f.type === 'OUVRIER' && f.on === nomOuvrier) { payeTotal += f.s; contrat = f.oc; métier = f.oj; history += `<tr><td>${f.date}</td><td>Acompte / Paiement</td><td style="text-align:right">${f.s.toLocaleString()} GNF</td></tr>`; } });
-    let h = `<div style="padding:40px; color:#000; background:#fff; font-family:sans-serif;"><div class="report-header"><div><h1 class="report-title">REÇU DE PAIEMENT</h1><p class="recu-ouvrier-title">OUVRIER : <b>${nomOuvrier.toUpperCase()}</b></p></div><div style="text-align:right"><p class="info-line">DATE : ${new Date().toLocaleDateString()}</p></div></div><div style="margin-bottom:20px;"><p class="info-line">PROJET : <b>${c.nom.toUpperCase()}</b></p><p class="info-line">MÉTIER : <b>${métier.toUpperCase()}</b></p><p class="info-line">MONTANT CONTRAT : <b>${contrat.toLocaleString()} GNF</b></p></div><table><thead><tr><th>DATE</th><th>DESCRIPTION</th><th>MONTANT</th></tr></thead><tbody>${history}</tbody></table><div class="total-box">TOTAL PAYÉ : ${payeTotal.toLocaleString()} GNF</div><div class="total-box ${contrat-payeTotal > 0 ? 'total-depense-rouge' : ''}">RESTE À PAYER : ${(contrat-payeTotal).toLocaleString()} GNF</div><div style="margin-top:50px; display:flex; justify-content:space-between;"><div style="text-align:center; border-top:1px solid #000; width:200px; padding-top:10px;">SIGNATURE OUVRIER</div><div style="text-align:center; border-top:1px solid #000; width:200px; padding-top:10px;">SIGNATURE CAISSIER</div></div></div>`;
+    let h = `<div style="padding:40px; color:#000; background:#fff; font-family:sans-serif;"><div class="report-header"><div><h1 class="report-title">REÇU DE PAIEMENT</h1><p class="recu-ouvrier-title">OUVRIER : <b>${nomOuvrier.toUpperCase()}</b></p></div><div style="text-align:right"><p class="info-line">DATE : ${new Date().toLocaleDateString()}</p></div></div><div style="margin-bottom:20px;"><p class="info-line">PROJET : <b>${c.nom.toUpperCase()}</b></p><p class="info-line">MÉTIER : <b>${métier.toUpperCase()}</b></p><p class="info-line">MONTANT CONTRAT : <b>${contrat.toLocaleString()} GNF</b></p></div><table><thead><tr><th>DATE</th><th>DESCRIPTION</th><th>MONTANT</th></tr></thead><tbody>${history}</tbody></table><div class="total-box">TOTAL PAYÉ : ${payeTotal.toLocaleString()} GNF</div><div class="total-box ${contrat-payeTotal > 0 ? 'total-depense-rouge' : ''}">RESTE À PAYER : ${(contrat-payeTotal).toLocaleString()} GNF</div><div class="signature-area"><img src="${currentSign}"></div></div>`;
     document.getElementById('printContent').innerHTML = h; window.print();
 }
 
@@ -523,24 +536,29 @@ function printGlobalReport() {
             h += `<tr><td><b>${c.nom.toUpperCase()}</b></td><td>${c.client.toUpperCase()}</td><td style="text-align:right">${inT.toLocaleString()}</td><td style="text-align:right">${outT.toLocaleString()}</td><td style="text-align:right"><b>${(inT-outT).toLocaleString()}</b></td></tr>`;
         }
     });
-    h += `</tbody></table><div class="total-box">SOLDE GLOBAL (PROJETS ACTIFS) : ${(gRecu-gDepense).toLocaleString()} GNF</div></div>`;
+    h += `</tbody></table><div class="total-box">SOLDE GLOBAL (PROJETS ACTIFS) : ${(gRecu-gDepense).toLocaleString()} GNF</div><div class="signature-area"><img src="${currentSign}"></div></div>`;
     document.getElementById('printContent').innerHTML = h; window.print();
 }
 
 function exportData() {
-    const data = JSON.stringify({db, config, logo: currentLogo}); const blob = new Blob([data], {type: 'application/json'});
+    const data = JSON.stringify({db, config, logo: currentLogo, sign: currentSign}); const blob = new Blob([data], {type: 'application/json'});
     const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `EKELEC_SAVE_${new Date().toISOString().split('T')[0]}.json`; a.click();
 }
 
 function copyDataText() {
-    const data = JSON.stringify({db, config, logo: currentLogo});
-    navigator.clipboard.writeText(data).then(() => { alert("TOUTES VOS DONNÉES ONT ÉTÉ COPIÉES !\n\nVous pouvez maintenant les coller dans WhatsApp ou un email pour les mettre à l'abri."); });
+    const data = JSON.stringify({db, config, logo: currentLogo, sign: currentSign});
+    navigator.clipboard.writeText(data).then(() => { alert("DONNÉES COPIÉES !"); });
 }
 
 function importData() {
     if(!confirm("ATTENTION : Importer un fichier va EFFACER vos données actuelles. Confirmer ?")) return;
     const file = document.getElementById('importFile').files[0]; const reader = new FileReader();
-    reader.onload = function(e) { const data = JSON.parse(e.target.result); db = data.db; config = data.config; if(data.logo) { currentLogo = data.logo; localStorage.setItem('EKELEC_LOGO', currentLogo); } saveDB(); localStorage.setItem('PRO_CONFIG', JSON.stringify(config)); location.reload(); };
+    reader.onload = function(e) { 
+        const data = JSON.parse(e.target.result); db = data.db; config = data.config; 
+        if(data.logo) { currentLogo = data.logo; localStorage.setItem('EKELEC_LOGO', currentLogo); }
+        if(data.sign) { currentSign = data.sign; localStorage.setItem('EKELEC_SIGN', currentSign); }
+        saveDB(); location.reload(); 
+    };
     reader.readAsText(file);
 }
 </script>
