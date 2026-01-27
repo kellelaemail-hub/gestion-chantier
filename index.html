@@ -80,11 +80,10 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
             <span id="displayGerant" class="text-[9px] font-black uppercase text-slate-400 mt-1 opacity-70">GÉRANT : </span>
         </div>
         <div class="flex gap-4 items-center">
-            <button onclick="copyDataText()" title="Sauvegarde de secours (Copier)" class="text-emerald-400 text-xl"><i class="fa-solid fa-copy"></i></button>
-            <button onclick="openModal('modalCode')" title="Changer le Code" class="text-amber-500 text-xl"><i class="fa-solid fa-key"></i></button>
-            <button onclick="exportData()" title="Sauvegarder" class="text-blue-400 text-xl"><i class="fa-solid fa-cloud-arrow-down"></i></button>
+            <button onclick="openModal('modalSettings')" title="Paramètres" class="text-slate-400 hover:text-amber-500 text-xl transition">
+                <i class="fa-solid fa-gear"></i>
+            </button>
             <input type="file" id="importFile" onchange="importData()" class="hidden">
-            <button onclick="document.getElementById('importFile').click()" title="Importer" class="text-yellow-400 text-xl"><i class="fa-solid fa-upload"></i></button>
             <button onclick="location.reload()" class="text-red-500 text-xl"><i class="fa-solid fa-power-off"></i></button>
         </div>
     </nav>
@@ -110,9 +109,7 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
                     <button onclick="viderChantier(); openModal('modalChantier')" class="bg-amber-500 text-black px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg">+ Nouveau Projet</button>
                 </div>
             </div>
-            
             <div id="listeChantiers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
             <div class="mt-12 pt-8 border-t border-slate-800">
                 <button onclick="toggleArchives()" class="text-slate-500 hover:text-amber-500 text-[10px] font-black uppercase flex items-center gap-2">
                     <i id="archiveIcon" class="fa-solid fa-box-archive"></i> <span id="archiveText">Afficher les archives</span>
@@ -177,7 +174,6 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
                 <p id="soldeGlobalFinances" class="text-2xl font-black text-amber-500">0 GNF</p>
             </div>
         </div>
-
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-hidden">
             <div class="md:col-span-1 space-y-4">
                 <div class="glass p-4 bg-slate-900/50">
@@ -202,10 +198,8 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
                     <button onclick="viderFormOp()" class="w-full mt-2 text-[10px] opacity-40 uppercase font-black hover:opacity-100 transition">Vider / Annuler</button>
                 </div>
             </div>
-
             <div class="md:col-span-2 flex flex-col space-y-4 overflow-hidden">
-                <div id="gridComptes" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    </div>
+                <div id="gridComptes" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
                 <div class="glass flex-1 flex flex-col overflow-hidden">
                     <p class="p-3 bg-slate-800 text-[10px] font-black uppercase text-slate-400">Journal des opérations financières</p>
                     <div class="overflow-y-auto flex-1">
@@ -217,6 +211,33 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
             </div>
         </div>
         <button onclick="closeModal('modalFinances')" class="mt-6 text-[10px] font-black uppercase text-slate-500 hover:text-white self-center">Fermer la fenêtre</button>
+    </div>
+</div>
+
+<div id="modalSettings" class="fixed inset-0 bg-black/95 hidden items-center justify-center p-4 z-[150] backdrop-blur-md">
+    <div class="glass p-8 w-full max-w-md border-t-[10px] border-slate-500 shadow-2xl">
+        <h3 class="font-black mb-6 uppercase text-white italic text-xl flex items-center gap-2">
+            <i class="fa-solid fa-gear text-amber-500"></i> Paramètres
+        </h3>
+        <div class="space-y-4">
+            <button onclick="openModal('modalCode'); closeModal('modalSettings')" class="w-full flex items-center justify-between bg-slate-800 p-4 rounded-xl hover:bg-slate-700 transition">
+                <span class="text-[10px] font-black uppercase">Changer le Code d'accès</span>
+                <i class="fa-solid fa-key text-amber-500"></i>
+            </button>
+            <button onclick="copyDataText()" class="w-full flex items-center justify-between bg-slate-800 p-4 rounded-xl hover:bg-slate-700 transition">
+                <span class="text-[10px] font-black uppercase">Copier les données (Secours)</span>
+                <i class="fa-solid fa-copy text-emerald-400"></i>
+            </button>
+            <button onclick="exportData()" class="w-full flex items-center justify-between bg-slate-800 p-4 rounded-xl hover:bg-slate-700 transition">
+                <span class="text-[10px] font-black uppercase">Exporter le fichier (Sauvegarde)</span>
+                <i class="fa-solid fa-cloud-arrow-down text-blue-400"></i>
+            </button>
+            <button onclick="document.getElementById('importFile').click(); closeModal('modalSettings')" class="w-full flex items-center justify-between bg-slate-800 p-4 rounded-xl hover:bg-slate-700 transition">
+                <span class="text-[10px] font-black uppercase">Importer un fichier</span>
+                <i class="fa-solid fa-upload text-yellow-400"></i>
+            </button>
+        </div>
+        <button onclick="closeModal('modalSettings')" class="w-full mt-6 text-[10px] opacity-40 uppercase font-black hover:opacity-100">Fermer</button>
     </div>
 </div>
 
@@ -233,7 +254,6 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
     <div class="glass p-10 w-full max-w-md border-t-[10px] border-amber-500 shadow-2xl overflow-y-auto max-h-[90vh]">
         <h3 class="font-black mb-4 uppercase text-amber-500 italic text-xl">Saisie de Flux</h3>
         <input type="hidden" id="editIndex">
-        
         <label class="text-[10px] font-black uppercase text-slate-400">Compte utilisé</label>
         <select id="fCompte" class="font-bold border-amber-500/50 border mb-4">
             <option value="ESPECES">ESPÈCES</option>
@@ -243,7 +263,6 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
             <option value="PAYCARD">PAYCARD</option>
             <option value="AUTRES">AUTRES</option>
         </select>
-
         <label class="text-[10px] font-black uppercase text-slate-400">Type de saisie</label>
         <select id="typeSaisie" onchange="toggleForm()" class="font-bold">
             <option value="DIVERS">DIVERS (Caisse)</option>
@@ -251,7 +270,6 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
             <option value="OUVRIER">OUVRIER (Main d'œuvre)</option>
             <option value="LOCATION">LOCATION</option>
         </select>
-        
         <label class="text-[10px] font-black uppercase text-slate-400">Corps de métier / Catégorie</label>
         <select id="fCat" class="font-bold">
             <option value="GENERAL">Général / Divers</option>
@@ -388,7 +406,6 @@ function renderHome(){
     const search = document.getElementById('searchHome').value.toLowerCase();
     div.innerHTML = ""; divArch.innerHTML = ""; 
     let gRecu = 0, gDepense = 0, activeCount = 0;
-    
     db.forEach((c,i)=>{
         let inT=0, outT=0; c.flux.forEach(f=>{ inT+=f.e; outT+=f.s; });
         let soldeP = inT - outT;
@@ -410,10 +427,8 @@ function renderHome(){
             if(c.archive) divArch.innerHTML += html; else div.innerHTML += html;
         }
     });
-
     let totalComptes = 0;
     ["ORANGE MONEY", "MOBILE MONEY", "BANQUE", "PAYCARD", "ESPECES", "AUTRES"].forEach(nom => { totalComptes += getSoldeCompte(nom); });
-
     document.getElementById('statTotalChantiers').innerText = activeCount;
     document.getElementById('statTotalRecu').innerText = gRecu.toLocaleString() + " GNF";
     document.getElementById('statTotalDepense').innerText = gDepense.toLocaleString() + " GNF";
@@ -421,15 +436,7 @@ function renderHome(){
     document.getElementById('statTotalSoldeComptes').className = totalComptes < 0 ? "text-xl font-black text-red-500" : "text-xl font-black text-amber-500";
 }
 
-// --- LOGIQUE FINANCES ---
-
-function openFinances() {
-    viderFormOp();
-    document.getElementById('opDate').valueAsDate = new Date();
-    renderFinances();
-    openModal('modalFinances');
-}
-
+function openFinances() { viderFormOp(); document.getElementById('opDate').valueAsDate = new Date(); renderFinances(); openModal('modalFinances'); }
 function getSoldeCompte(nomCompte) {
     let solde = 0;
     db.forEach(c => { c.flux.forEach(f => { if(f.compte === nomCompte) solde += (f.e - f.s); }); });
@@ -491,23 +498,17 @@ function editOperation(idx) {
 }
 
 function deleteOperation(idx) { if(confirm("Supprimer cette opération ?")) { financeDB.splice(idx, 1); saveDB(); renderFinances(); renderHome(); } }
-
-function viderFormOp() {
-    document.getElementById('editOpIndex').value = "";
-    document.getElementById('opMotif').value = "";
-    document.getElementById('opMontant').value = "";
-    document.getElementById('opDate').valueAsDate = new Date();
-}
-
-// --- FIN LOGIQUE FINANCES ---
+function viderFormOp() { document.getElementById('editOpIndex').value = ""; document.getElementById('opMotif').value = ""; document.getElementById('opMontant').value = ""; document.getElementById('opDate').valueAsDate = new Date(); }
 
 function renderJournal(){
-    const c = db[currentId]; const tbody = document.getElementById('tableBody'); 
+    const c = db[currentId];
+    const tbody = document.getElementById('tableBody'); 
     const lOuv = document.getElementById('listeOuvriers');
     const divBilan = document.getElementById('bilanCategories');
     const divInv = document.getElementById('inventaireMateriel');
     tbody.innerHTML = ""; lOuv.innerHTML = ""; divBilan.innerHTML = ""; divInv.innerHTML = "";
-    let workers = {}; let cats = {}; let runningSolde = 0; let items = {};
+    let workers = {}; let cats = {};
+    let runningSolde = 0; let items = {};
     c.flux.sort((a, b) => new Date(a.date) - new Date(b.date));
     c.flux.forEach((f,idx)=>{
         runningSolde += (f.e - f.s);
@@ -550,15 +551,7 @@ function renderJournal(){
     }
 }
 
-function ajouterAcompteRapide(nom, job, contrat) {
-    viderSaisie();
-    document.getElementById('typeSaisie').value = "OUVRIER"; toggleForm();
-    document.getElementById('fOuvNom').value = nom; document.getElementById('fOuvJob').value = job;
-    document.getElementById('fOuvC').value = contrat; document.getElementById('fDate').valueAsDate = new Date();
-    updateOuvrierInfo();
-    openModal('modalSaisie');
-}
-
+function ajouterAcompteRapide(nom, job, contrat) { viderSaisie(); document.getElementById('typeSaisie').value = "OUVRIER"; toggleForm(); document.getElementById('fOuvNom').value = nom; document.getElementById('fOuvJob').value = job; document.getElementById('fOuvC').value = contrat; document.getElementById('fDate').valueAsDate = new Date(); updateOuvrierInfo(); openModal('modalSaisie'); }
 function parseNum(v) { if(!v) return 0; return parseFloat(String(v).replace(',', '.')) || 0; }
 
 function editEntry(idx) {
@@ -583,28 +576,11 @@ function editEntry(idx) {
 function saveEntry(keepOpen) {
     const idx = document.getElementById('editIndex').value;
     const type = document.getElementById('typeSaisie').value;
-    let entry = { 
-        type: type, 
-        date: document.getElementById('fDate').value, 
-        cat: document.getElementById('fCat').value, 
-        compte: document.getElementById('fCompte').value,
-        e: 0, s: 0, txt: "", oc: 0, on: "", oj: "", locBat: "", locMois: "" 
-    };
+    let entry = { type: type, date: document.getElementById('fDate').value, cat: document.getElementById('fCat').value, compte: document.getElementById('fCompte').value, e: 0, s: 0, txt: "", oc: 0, on: "", oj: "", locBat: "", locMois: "" };
     if(type === 'DIVERS') { entry.e = parseNum(document.getElementById('fE').value); entry.s = parseNum(document.getElementById('fS').value); entry.txt = document.getElementById('fMotif').value || "Divers"; }
-    else if(type === 'ARTICLE') { 
-        let p = parseNum(document.getElementById('fArtP').value), q = parseNum(document.getElementById('fArtQ').value);
-        let nomArt = document.getElementById('fArtNom').value; entry.s = p * q; entry.txt = `ARTICLE : ${nomArt.toUpperCase()} (x${q})`;
-    }
-    else if(type === 'OUVRIER') { 
-        entry.on = document.getElementById('fOuvNom').value.trim(); entry.oj = document.getElementById('fOuvJob').value; 
-        entry.oc = parseNum(document.getElementById('fOuvC').value); entry.s = parseNum(document.getElementById('fOuvA').value); 
-        entry.txt = `PAYE : ${entry.on.toUpperCase()}`;
-    }
-    else if(type === 'LOCATION') {
-        const nom = document.getElementById('fLocNom').value.toUpperCase(); const bat = document.getElementById('fLocBat').value;
-        const mois = document.getElementById('fLocMois').value; entry.e = parseNum(document.getElementById('fLocRecu').value); entry.s = parseNum(document.getElementById('fLocPaye').value);
-        entry.locBat = bat; entry.locMois = mois; entry.txt = `LOCATION : ${nom} (BAT: ${bat}) - MOIS: ${mois}`;
-    }
+    else if(type === 'ARTICLE') { let p = parseNum(document.getElementById('fArtP').value), q = parseNum(document.getElementById('fArtQ').value); let nomArt = document.getElementById('fArtNom').value; entry.s = p * q; entry.txt = `ARTICLE : ${nomArt.toUpperCase()} (x${q})`; }
+    else if(type === 'OUVRIER') { entry.on = document.getElementById('fOuvNom').value.trim(); entry.oj = document.getElementById('fOuvJob').value; entry.oc = parseNum(document.getElementById('fOuvC').value); entry.s = parseNum(document.getElementById('fOuvA').value); entry.txt = `PAYE : ${entry.on.toUpperCase()}`; }
+    else if(type === 'LOCATION') { const nom = document.getElementById('fLocNom').value.toUpperCase(); const bat = document.getElementById('fLocBat').value; const mois = document.getElementById('fLocMois').value; entry.e = parseNum(document.getElementById('fLocRecu').value); entry.s = parseNum(document.getElementById('fLocPaye').value); entry.locBat = bat; entry.locMois = mois; entry.txt = `LOCATION : ${nom} (BAT: ${bat}) - MOIS: ${mois}`; }
     if(idx !== "") db[currentId].flux[idx] = entry; else db[currentId].flux.push(entry);
     saveDB(); renderJournal(); renderHome(); viderSaisie(); if(!keepOpen) closeModal('modalSaisie');
 }
@@ -612,11 +588,9 @@ function saveEntry(keepOpen) {
 function viderSaisie() { document.querySelectorAll('#modalSaisie input').forEach(i => i.value = ""); document.getElementById('editIndex').value = ""; document.getElementById('fCat').value = "GENERAL"; document.getElementById('typeSaisie').value = "DIVERS"; document.getElementById('fCompte').value = "ESPECES"; toggleForm(); }
 function deleteEntry(idx) { if(confirm("Supprimer cette ligne ?")) { db[currentId].flux.splice(idx, 1); saveDB(); renderJournal(); renderHome(); } }
 function viderChantier() { document.getElementById('cNom').value = ""; document.getElementById('cLieu').value = ""; document.getElementById('cClient').value = ""; document.getElementById('editChantierIndex').value = ""; document.getElementById('chantierModalTitre').innerText = "Nouveau Projet"; document.getElementById('btnCreateChantier').innerText = "CRÉER"; }
-
 function editProject(e, i) { e.stopPropagation(); const c = db[i]; document.getElementById('editChantierIndex').value = i; document.getElementById('cNom').value = c.nom; document.getElementById('cLieu').value = c.lieu; document.getElementById('cClient').value = c.client; document.getElementById('chantierModalTitre').innerText = "Modifier Projet"; document.getElementById('btnCreateChantier').innerText = "METTRE À JOUR"; openModal('modalChantier'); }
 function createChantier() { const n = document.getElementById('cNom').value.trim(); const idx = document.getElementById('editChantierIndex').value; if(n) { if(idx !== "") { db[idx].nom = n; db[idx].lieu = document.getElementById('cLieu').value; db[idx].client = document.getElementById('cClient').value; } else { db.push({ nom: n, lieu: document.getElementById('cLieu').value, client: document.getElementById('cClient').value, flux: [], archive: false }); } saveDB(); viderChantier(); closeModal('modalChantier'); renderHome(); } }
 function deleteProject(e, i) { e.stopPropagation(); const codeCheck = prompt("SÉCURITÉ : Entrez le CODE ACCÈS pour supprimer ce projet :"); if(codeCheck === config.code) { if(confirm("Confirmer définitivement la suppression ?")) { db.splice(i,1); saveDB(); renderHome(); } } }
-
 function archiveProject(e, i) { e.stopPropagation(); if(confirm("Archiver ce projet ?")) { db[i].archive = true; saveDB(); renderHome(); } }
 function restoreProject(e, i) { e.stopPropagation(); if(confirm("Restaurer ce projet ?")) { db[i].archive = false; saveDB(); renderHome(); } }
 function toggleArchives() { const div = document.getElementById('listeArchives'); const text = document.getElementById('archiveText'); const icon = document.getElementById('archiveIcon'); if(div.classList.contains('hidden')) { div.classList.remove('hidden'); text.innerText = "Masquer les archives"; icon.classList.replace('fa-box-archive', 'fa-eye-slash'); } else { div.classList.add('hidden'); text.innerText = "Afficher les archives"; icon.classList.replace('fa-eye-slash', 'fa-box-archive'); } }
