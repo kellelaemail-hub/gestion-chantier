@@ -334,7 +334,6 @@ window.onload = () => {
     document.getElementById('navLogo').src = currentLogo;
     document.getElementById('logoPreview').src = currentLogo;
     document.getElementById('signPreview').src = currentSign;
-
     const dernierGerant = localStorage.getItem('DERNIER_GERANT');
     if (dernierGerant) {
         document.getElementById('userGerant').value = dernierGerant;
@@ -372,9 +371,13 @@ function openModal(id) {
     document.getElementById(id).classList.remove('hidden'); 
     document.getElementById(id).classList.add('flex'); 
 }
+
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
+
 function goHome() { document.getElementById('viewAccueil').classList.remove('hidden'); document.getElementById('viewProjet').classList.add('hidden'); renderHome(); }
+
 function openProject(i) { currentId = i; document.getElementById('viewAccueil').classList.add('hidden'); document.getElementById('viewProjet').classList.remove('hidden'); document.getElementById('chantierTitre').innerText = db[i].nom; document.getElementById('chantierInfos').innerText = `${db[i].lieu || ''} | CLIENT: ${db[i].client || 'N/A'}`; renderJournal(); }
+
 function validerParEntree() { if (!document.getElementById('loginPage').classList.contains('hidden')) { checkLogin(); } }
 
 function checkLogin(){
@@ -431,22 +434,17 @@ function renderHome(){
     db.forEach((c,i)=>{
         let inT=0, outT=0; c.flux.forEach(f=>{ inT+=f.e; outT+=f.s; });
         let soldeP = inT - outT;
-        
-        // Calcul pour la barre de progression
         let pct = 0;
         if(inT > 0) pct = Math.min((outT / inT) * 100, 100);
         let barColor = pct > 90 ? 'bg-red-500' : 'bg-emerald-500';
         let alertClass = pct > 90 ? 'alert-pulse' : '';
-
         if(!c.archive) { gRecu += inT; gDepense += outT; activeCount++; }
         if(c.nom.toLowerCase().includes(search)){
             let html = `<div class="glass p-6 relative cursor-pointer border-b-4 border-transparent hover:border-amber-500" onclick="openProject(${i})">
                 <h3 class="text-xl font-black text-amber-500 uppercase italic">${c.nom}</h3>
-                
                 <div class="w-full bg-slate-800 h-1.5 rounded-full mt-2 mb-4 overflow-hidden">
                     <div class="${barColor} ${alertClass} h-full transition-all duration-500" style="width: ${pct}%"></div>
                 </div>
-
                 <div class="mt-4 space-y-1">
                     <div class="flex justify-between text-[10px] font-black"><span>REÇU:</span><span class="text-emerald-400">${inT.toLocaleString()} GNF</span></div>
                     <div class="flex justify-between text-[10px] font-black"><span>SORTIE:</span><span class="text-red-400">${outT.toLocaleString()} GNF</span></div>
@@ -471,10 +469,11 @@ function renderHome(){
 }
 
 function openFinances() { viderFormOp(); document.getElementById('opDate').valueAsDate = new Date(); renderFinances(); openModal('modalFinances'); }
+
 function getSoldeCompte(nomCompte) {
     let solde = 0;
-    db.forEach(c => { c.flux.forEach(f => { if(f.compte === nomCompte) solde += (f.e - f.s); }); });
-    financeDB.forEach(op => { if(op.compte === nomCompte) solde += (op.type === 'DEPOT' ? op.montant : -op.montant); });
+    db.forEach(c => { c.flux.forEach(f => { if(f.compte === nomCompte) solde += (parseNum(f.e) - parseNum(f.s)); }); });
+    financeDB.forEach(op => { if(op.compte === nomCompte) solde += (op.type === 'DEPOT' ? parseNum(op.montant) : -parseNum(op.montant)); });
     return solde;
 }
 
@@ -586,6 +585,7 @@ function renderJournal(){
 }
 
 function ajouterAcompteRapide(nom, job, contrat) { viderSaisie(); document.getElementById('typeSaisie').value = "OUVRIER"; toggleForm(); document.getElementById('fOuvNom').value = nom; document.getElementById('fOuvJob').value = job; document.getElementById('fOuvC').value = contrat; document.getElementById('fDate').valueAsDate = new Date(); updateOuvrierInfo(); openModal('modalSaisie'); }
+
 function parseNum(v) { if(!v) return 0; return parseFloat(String(v).replace(',', '.')) || 0; }
 
 function editEntry(idx) {
@@ -603,7 +603,7 @@ function editEntry(idx) {
         document.getElementById('fArtP').value = f.s / q; document.getElementById('fArtQ').value = q;
     }
     else if(f.type === 'OUVRIER') { document.getElementById('fOuvNom').value = f.on; document.getElementById('fOuvJob').value = f.oj; document.getElementById('fOuvC').value = f.oc; document.getElementById('fOuvA').value = f.s; updateOuvrierInfo(); }
-    else if(f.type === 'LOCATION') { const nom = document.getElementById('fLocNom').value.toUpperCase(); const bat = document.getElementById('fLocBat').value; const mois = document.getElementById('fLocMois').value; entry.e = parseNum(document.getElementById('fLocRecu').value); entry.s = parseNum(document.getElementById('fLocPaye').value); entry.locBat = bat; entry.locMois = mois; entry.txt = `LOCATION : ${nom} (BAT: ${bat}) - MOIS: ${mois}`; }
+    else if(f.type === 'LOCATION') { document.getElementById('fLocNom').value = f.txt.split(' : ')[1].split(' (BAT')[0]; document.getElementById('fLocBat').value = f.locBat; document.getElementById('fLocMois').value = f.locMois; document.getElementById('fLocRecu').value = f.e; document.getElementById('fLocPaye').value = f.s; }
     openModal('modalSaisie');
 }
 
@@ -620,23 +620,29 @@ function saveEntry(keepOpen) {
 }
 
 function viderSaisie() { document.querySelectorAll('#modalSaisie input').forEach(i => i.value = ""); document.getElementById('editIndex').value = ""; document.getElementById('fCat').value = "GENERAL"; document.getElementById('typeSaisie').value = "DIVERS"; document.getElementById('fCompte').value = "ESPECES"; toggleForm(); }
+
 function deleteEntry(idx) { if(confirm("Supprimer cette ligne ?")) { db[currentId].flux.splice(idx, 1); saveDB(); renderJournal(); renderHome(); } }
+
 function viderChantier() { document.getElementById('cNom').value = ""; document.getElementById('cLieu').value = ""; document.getElementById('cClient').value = ""; document.getElementById('editChantierIndex').value = ""; document.getElementById('chantierModalTitre').innerText = "Nouveau Projet"; document.getElementById('btnCreateChantier').innerText = "CRÉER"; }
+
 function editProject(e, i) { e.stopPropagation(); const c = db[i]; document.getElementById('editChantierIndex').value = i; document.getElementById('cNom').value = c.nom; document.getElementById('cLieu').value = c.lieu; document.getElementById('cClient').value = c.client; document.getElementById('chantierModalTitre').innerText = "Modifier Projet"; document.getElementById('btnCreateChantier').innerText = "METTRE À JOUR"; openModal('modalChantier'); }
+
 function createChantier() { const n = document.getElementById('cNom').value.trim(); const idx = document.getElementById('editChantierIndex').value; if(n) { if(idx !== "") { db[idx].nom = n; db[idx].lieu = document.getElementById('cLieu').value; db[idx].client = document.getElementById('cClient').value; } else { db.push({ nom: n, lieu: document.getElementById('cLieu').value, client: document.getElementById('cClient').value, flux: [], archive: false }); } saveDB(); viderChantier(); closeModal('modalChantier'); renderHome(); } }
+
 function deleteProject(e, i) { e.stopPropagation(); const codeCheck = prompt("SÉCURITÉ : Entrez le CODE ACCÈS pour supprimer ce projet :"); if(codeCheck === config.code) { if(confirm("Confirmer définitivement la suppression ?")) { db.splice(i,1); saveDB(); renderHome(); } } }
+
 function archiveProject(e, i) { e.stopPropagation(); if(confirm("Archiver ce projet ?")) { db[i].archive = true; saveDB(); renderHome(); } }
+
 function restoreProject(e, i) { e.stopPropagation(); if(confirm("Restaurer ce projet ?")) { db[i].archive = false; saveDB(); renderHome(); } }
+
 function toggleArchives() { const div = document.getElementById('listeArchives'); const text = document.getElementById('archiveText'); const icon = document.getElementById('archiveIcon'); if(div.classList.contains('hidden')) { div.classList.remove('hidden'); text.innerText = "Masquer les archives"; icon.classList.replace('fa-box-archive', 'fa-eye-slash'); } else { div.classList.add('hidden'); text.innerText = "Afficher les archives"; icon.classList.replace('fa-eye-slash', 'fa-box-archive'); } }
 
 function prepareTransfert() {
     const sSource = document.getElementById('tSource');
     const sDest = document.getElementById('tDest');
     const infoSolde = document.getElementById('transfertSoldeInfo');
-    
     sSource.innerHTML = '<option value="">-- Choisir Source --</option>';
     sDest.innerHTML = '<option value="">-- Choisir Destination --</option>';
-    
     db.forEach((c, i) => {
         if(!c.archive) {
             let opt = `<option value="${i}">${c.nom.toUpperCase()}</option>`;
@@ -644,8 +650,6 @@ function prepareTransfert() {
             sDest.innerHTML += opt;
         }
     });
-
-    // Écouteur pour mettre à jour le solde en temps réel
     sSource.onchange = () => {
         const idx = sSource.value;
         if(idx !== "") {
@@ -654,11 +658,8 @@ function prepareTransfert() {
             const solde = inT - outT;
             infoSolde.innerText = `Solde disponible : ${solde.toLocaleString()} GNF`;
             infoSolde.classList.remove('hidden');
-        } else {
-            infoSolde.classList.add('hidden');
-        }
+        } else { infoSolde.classList.add('hidden'); }
     };
-
     infoSolde.classList.add('hidden');
     document.getElementById('tDate').valueAsDate = new Date();
 }
@@ -669,15 +670,10 @@ function executerTransfert() {
     const montant = parseNum(document.getElementById('tMontant').value);
     const compte = document.getElementById('tCompte').value;
     const date = document.getElementById('tDate').value;
-
-    if(idxS === "" || idxD === "" || idxS === idxD || montant <= 0) {
-        alert("Veuillez vérifier les projets et le montant.");
-        return;
-    }
+    if(idxS === "" || idxD === "" || idxS === idxD || montant <= 0) { alert("Veuillez vérifier les projets et le montant."); return; }
     db[idxS].flux.push({ type: 'DIVERS', date: date, cat: 'TRANSFERT', compte: compte, e: 0, s: montant, txt: `TRANSFERT VERS : ${db[idxD].nom.toUpperCase()}` });
     db[idxD].flux.push({ type: 'DIVERS', date: date, cat: 'TRANSFERT', compte: compte, e: montant, s: 0, txt: `TRANSFERT DEPUIS : ${db[idxS].nom.toUpperCase()}` });
-    saveDB(); renderHome(); closeModal('modalTransfert');
-    alert("Transfert effectué !");
+    saveDB(); renderHome(); closeModal('modalTransfert'); alert("Transfert effectué !");
 }
 
 function printReport() { 
@@ -689,7 +685,12 @@ function printReport() {
         ti += f.e; to += f.s; soldeCaisse += (f.e - f.s); 
         let rowClass = f.e > 0 ? 'row-entree' : (f.s > 0 ? 'row-sortie' : '');
         let sortieTxt = f.s > 0 ? f.s.toLocaleString() : '-'; 
-        if(f.type === 'OUVRIER') { if(!ouvriersSuivi[f.on]) ouvriersSuivi[f.on] = 0; ouvriersSuivi[f.on] += f.s; sortieTxt = `<b>${f.s.toLocaleString()}</b> <span style="font-size:8px">(Reste: ${(f.oc - ouvriersSuivi[f.on]).toLocaleString()})</span>`; } 
+        if(f.type === 'OUVRIER') { 
+            if(!ouvriersSuivi[f.on]) ouvriersSuivi[f.on] = 0; 
+            ouvriersSuivi[f.on] += f.s; 
+            let resteCalcul = (f.oc || 0) - ouvriersSuivi[f.on];
+            sortieTxt = `<b>${f.s.toLocaleString()}</b>` + (f.oc > 0 ? ` <span style="font-size:8px">(Reste: ${resteCalcul.toLocaleString()})</span>` : ''); 
+        } 
         h += `<tr class="${rowClass}"><td>${f.date}</td><td><b>${f.txt}</b> <span class="cat-badge">${f.cat || 'GENERAL'}</span></td><td style="text-align:right">${f.e>0?f.e.toLocaleString():'-'}</td><td style="text-align:right">${sortieTxt}</td><td style="text-align:right; background:#f8fafc"><b>${soldeCaisse.toLocaleString()}</b></td></tr>`; 
     });
     h += `</tbody></table><div class="total-box total-depense-rouge">TOTAL DÉPENSÉ : ${to.toLocaleString()} GNF</div><div class="total-box">SOLDE NET EN CAISSE : ${(ti-to).toLocaleString()} GNF</div><div class="signature-area"><p style="font-size:10px; margin-bottom:5px;">Cachet & Signature :</p><img src="${currentSign}"></div></div>`;
@@ -727,14 +728,18 @@ function copyDataText() {
 
 function importData() {
     if(!confirm("ATTENTION : Importer va EFFACER vos données actuelles. Confirmer ?")) return;
-    const file = document.getElementById('importFile').files[0]; const reader = new FileReader();
+    const file = document.getElementById('importFile').files[0]; 
+    if(!file) return;
+    const reader = new FileReader();
     reader.onload = function(e) { 
-        const data = JSON.parse(e.target.result);
-        db = data.db; config = data.config; 
-        if(data.financeDB) financeDB = data.financeDB;
-        if(data.logo) { currentLogo = data.logo; localStorage.setItem('EKELEC_LOGO', currentLogo); }
-        if(data.sign) { currentSign = data.sign; localStorage.setItem('EKELEC_SIGN', currentSign); }
-        saveDB(); location.reload(); 
+        try {
+            const data = JSON.parse(e.target.result);
+            db = data.db; config = data.config; 
+            if(data.financeDB) financeDB = data.financeDB;
+            if(data.logo) { currentLogo = data.logo; localStorage.setItem('EKELEC_LOGO', currentLogo); }
+            if(data.sign) { currentSign = data.sign; localStorage.setItem('EKELEC_SIGN', currentSign); }
+            saveDB(); location.reload(); 
+        } catch(err) { alert("Erreur lors de la lecture du fichier."); }
     };
     reader.readAsText(file);
 }
