@@ -42,27 +42,15 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
     .signature-area { margin-top: 20px; text-align: right; }
     .signature-area img { max-width: 150px; display: inline-block; }
 }
+@keyframes pulse-red { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.alert-pulse { animation: pulse-red 1s infinite; }
 </style>
 </head>
 <body onkeydown="if(event.key==='Enter') validerParEntree()">
 
 <div id="loginPage" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950">
     <div class="glass p-10 w-full max-w-md text-center shadow-2xl">
-        <div class="flex justify-center gap-4 mb-4">
-            <div>
-                <img id="logoPreview" src="https://via.placeholder.com/120?text=LOGO" alt="Logo">
-                <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-[9px] px-2 py-1 rounded font-black uppercase">
-                    Logo <input type="file" id="logoInput" class="hidden" accept="image/*" onchange="previewImage(this, 'logo')">
-                </label>
-            </div>
-            <div>
-                <img id="signPreview" src="https://via.placeholder.com/120?text=CACHET" alt="Cachet">
-                <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-[9px] px-2 py-1 rounded font-black uppercase">
-                    Cachet <input type="file" id="signInput" class="hidden" accept="image/*" onchange="previewImage(this, 'sign')">
-                </label>
-            </div>
-        </div>
-        <h1 class="text-4xl font-black text-amber-500 mb-6 italic uppercase tracking-tighter">EKELEC</h1>
+        <img id="loginLogo" src="" class="mx-auto mb-6 h-24 w-24 object-contain rounded-xl shadow-lg border border-amber-500/20">
         <p class="text-[10px] text-slate-400 uppercase font-black mb-4 tracking-[3px]">Accès Gestionnaire</p>
         <input type="text" id="userGerant" value="EKELEC" class="text-center mb-2 uppercase font-bold border-amber-500/30" autocomplete="off">
         <input type="password" id="passAccess" placeholder="CODE ACCÈS" class="text-center text-2xl tracking-[10px]" autocomplete="new-password">
@@ -106,6 +94,7 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
                 <input type="text" id="searchHome" oninput="renderHome()" placeholder="Rechercher..." class="max-w-xs mb-0" autocomplete="off">
                 <div class="flex gap-2">
                     <button onclick="openFinances()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg flex items-center gap-2 transition hover:bg-blue-500"><i class="fa-solid fa-wallet"></i> Opérations</button>
+                    <button onclick="openModal('modalTransfert')" class="bg-purple-600 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg flex items-center gap-2 transition hover:bg-purple-500"><i class="fa-solid fa-exchange-alt"></i> Transfert</button>
                     <button onclick="viderChantier(); openModal('modalChantier')" class="bg-amber-500 text-black px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg">+ Nouveau Projet</button>
                 </div>
             </div>
@@ -162,63 +151,25 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
     </div>
 </div>
 
-<div id="modalFinances" class="fixed inset-0 bg-black/95 hidden items-start justify-center p-4 z-[100] backdrop-blur-md overflow-y-auto">
-    <div class="glass p-8 w-full max-w-4xl border-t-[10px] border-blue-500 shadow-2xl flex flex-col">
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <h3 class="font-black uppercase text-blue-400 italic text-xl">Gestion des Finances</h3>
-                <p class="text-[9px] font-black opacity-40 uppercase tracking-widest">Dépôts, Retraits et Soldes</p>
-            </div>
-            <div class="text-right">
-                <p class="text-[10px] font-black opacity-40 uppercase">Richesse Nette (Tous comptes)</p>
-                <p id="soldeGlobalFinances" class="text-2xl font-black text-amber-500">0 GNF</p>
-            </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-hidden">
-            <div class="md:col-span-1 space-y-4">
-                <div class="glass p-4 bg-slate-900/50">
-                    <h4 class="text-[10px] font-black uppercase text-slate-400 mb-4">Enregistrer un mouvement</h4>
-                    <input type="hidden" id="editOpIndex">
-                    <select id="opType" class="font-bold">
-                        <option value="DEPOT">DÉPÔT (+)</option>
-                        <option value="RETRAIT">RETRAIT (-)</option>
-                    </select>
-                    <select id="opCompte" class="font-bold border-blue-500/30 border">
-                        <option value="ORANGE MONEY">ORANGE MONEY</option>
-                        <option value="MOBILE MONEY">MOBILE MONEY</option>
-                        <option value="BANQUE">BANQUE</option>
-                        <option value="PAYCARD">PAYCARD</option>
-                        <option value="ESPECES">ESPÈCES</option>
-                        <option value="AUTRES">AUTRES</option>
-                    </select>
-                    <input type="text" id="opMotif" placeholder="Détail / Motif" autocomplete="off">
-                    <input type="text" id="opMontant" placeholder="Montant GNF" autocomplete="off">
-                    <input type="date" id="opDate">
-                    <button onclick="saveOperationFinanciere()" class="btn-gold w-full py-3 mt-2">Valider l'opération</button>
-                    <button onclick="viderFormOp()" class="w-full mt-2 text-[10px] opacity-40 uppercase font-black hover:opacity-100 transition">Vider / Annuler</button>
-                </div>
-            </div>
-            <div class="md:col-span-2 flex flex-col space-y-4 overflow-hidden">
-                <div id="gridComptes" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
-                <div class="glass flex-1 flex flex-col overflow-hidden">
-                    <p class="p-3 bg-slate-800 text-[10px] font-black uppercase text-slate-400">Journal des opérations financières</p>
-                    <div class="overflow-y-auto flex-1">
-                        <table class="w-full text-left text-[10px]">
-                            <tbody id="tableOpsBody" class="divide-y divide-slate-700/50"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <button onclick="closeModal('modalFinances')" class="mt-6 text-[10px] font-black uppercase text-slate-500 hover:text-white self-center">Fermer la fenêtre</button>
-    </div>
-</div>
-
 <div id="modalSettings" class="fixed inset-0 bg-black/95 hidden items-center justify-center p-4 z-[150] backdrop-blur-md">
-    <div class="glass p-8 w-full max-w-md border-t-[10px] border-slate-500 shadow-2xl">
+    <div class="glass p-8 w-full max-w-md border-t-[10px] border-slate-500 shadow-2xl overflow-y-auto max-h-[95vh]">
         <h3 class="font-black mb-6 uppercase text-white italic text-xl flex items-center gap-2">
             <i class="fa-solid fa-gear text-amber-500"></i> Paramètres
         </h3>
+        <div class="flex justify-center gap-4 mb-8 bg-slate-900/50 p-4 rounded-xl border border-slate-700">
+            <div class="text-center">
+                <img id="logoPreview" src="https://via.placeholder.com/120?text=LOGO" alt="Logo">
+                <label class="cursor-pointer bg-amber-500 text-black text-[9px] px-3 py-2 rounded font-black uppercase">
+                    Modifier Logo <input type="file" id="logoInput" class="hidden" accept="image/*" onchange="previewImage(this, 'logo')">
+                </label>
+            </div>
+            <div class="text-center">
+                <img id="signPreview" src="https://via.placeholder.com/120?text=CACHET" alt="Cachet">
+                <label class="cursor-pointer bg-amber-500 text-black text-[9px] px-3 py-2 rounded font-black uppercase">
+                    Modifier Cachet <input type="file" id="signInput" class="hidden" accept="image/*" onchange="previewImage(this, 'sign')">
+                </label>
+            </div>
+        </div>
         <div class="space-y-4">
             <button onclick="openModal('modalCode'); closeModal('modalSettings')" class="w-full flex items-center justify-between bg-slate-800 p-4 rounded-xl hover:bg-slate-700 transition">
                 <span class="text-[10px] font-black uppercase">Changer le Code d'accès</span>
@@ -303,14 +254,93 @@ input, select { background: #0f172a !important; border: 1px solid #475569 !impor
     </div>
 </div>
 
+<div id="modalFinances" class="fixed inset-0 bg-black/95 hidden items-center justify-center p-4 z-[100] backdrop-blur-md">
+    <div class="glass p-8 w-full max-w-2xl border-t-[10px] border-blue-500 shadow-2xl overflow-y-auto max-h-[90vh]">
+        <h3 class="font-black mb-4 uppercase text-blue-400 italic text-xl flex justify-between items-center">
+            <span>Opérations Financières</span>
+            <div class="flex items-center gap-4">
+                <span id="soldeGlobalFinances" class="text-2xl font-black text-white">0 GNF</span>
+                <button onclick="closeModal('modalFinances')" class="text-slate-500 hover:text-white text-3xl font-light">&times;</button>
+            </div>
+        </h3>
+        <div id="gridComptes" class="grid grid-cols-2 md:grid-cols-3 gap-2 mb-6"></div>
+        <div class="bg-slate-900/50 p-6 rounded-xl border border-slate-700 mb-6">
+            <input type="hidden" id="editOpIndex">
+            <div class="grid grid-cols-2 gap-2">
+                <select id="opType" class="font-bold"><option value="DEPOT">DÉPÔT (+)</option><option value="RETRAIT">RETRAIT (-)</option></select>
+                <select id="opCompte" class="font-bold">
+                    <option value="ESPECES">ESPÈCES</option>
+                    <option value="ORANGE MONEY">ORANGE MONEY</option>
+                    <option value="MOBILE MONEY">MOBILE MONEY</option>
+                    <option value="BANQUE">BANQUE</option>
+                    <option value="PAYCARD">PAYCARD</option>
+                    <option value="AUTRES">AUTRES</option>
+                </select>
+            </div>
+            <input type="text" id="opMotif" placeholder="Motif de l'opération" autocomplete="off">
+            <div class="grid grid-cols-2 gap-2">
+                <input type="text" id="opMontant" placeholder="Montant">
+                <input type="date" id="opDate">
+            </div>
+            <button onclick="saveOperationFinanciere()" class="btn-gold !bg-blue-600 !text-white w-full mt-2">ENREGISTRER L'OPÉRATION</button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-[10px]">
+                <thead class="bg-slate-800 uppercase font-black"><tr><th class="p-3">Compte</th><th class="p-3">Motif</th><th class="p-3">Montant</th><th class="p-3 text-right">Action</th></tr></thead>
+                <tbody id="tableOpsBody"></tbody>
+            </table>
+        </div>
+        <button onclick="closeModal('modalFinances')" class="w-full mt-6 text-[10px] opacity-40 uppercase font-black">Fermer</button>
+    </div>
+</div>
+
+<div id="modalTransfert" class="fixed inset-0 bg-black/95 hidden items-center justify-center p-4 z-[110] backdrop-blur-md">
+    <div class="glass p-10 w-full max-w-md border-t-[10px] border-purple-500 shadow-2xl">
+        <h3 class="font-black mb-6 uppercase text-purple-400 italic text-xl">Transfert Inter-Projets</h3>
+        <label class="text-[10px] font-black uppercase text-slate-400">Projet Source (Départ)</label>
+        <select id="tSource" class="font-bold border-purple-500/30"></select>
+<div id="transfertSoldeInfo" class="text-[10px] font-black text-emerald-400 uppercase mb-4 hidden">Solde disponible : 0 GNF</div>
+        <label class="text-[10px] font-black uppercase text-slate-400">Projet Destination (Arrivée)</label>
+        <select id="tDest" class="font-bold border-purple-500/30"></select>
+        <label class="text-[10px] font-black uppercase text-slate-400">Compte utilisé</label>
+        <select id="tCompte" class="font-bold">
+            <option value="ESPECES">ESPÈCES</option>
+            <option value="ORANGE MONEY">ORANGE MONEY</option>
+            <option value="MOBILE MONEY">MOBILE MONEY</option>
+            <option value="BANQUE">BANQUE</option>
+            <option value="PAYCARD">PAYCARD</option>
+            <option value="AUTRES">AUTRES</option>
+        </select>
+        <input type="text" id="tMontant" placeholder="MONTANT DU TRANSFERT">
+        <input type="date" id="tDate">
+        <button onclick="executerTransfert()" class="btn-gold !bg-purple-600 !text-white w-full mt-4">VALIDER LE TRANSFERT</button>
+        <button onclick="closeModal('modalTransfert')" class="w-full mt-4 text-[10px] opacity-40 uppercase font-black">Annuler</button>
+    </div>
+</div>
+
 <div id="printArea"><div id="printContent"></div></div>
 
 <script>
 let currentLogo = localStorage.getItem('EKELEC_LOGO') || "https://via.placeholder.com/120?text=LOGO";
 let currentSign = localStorage.getItem('EKELEC_SIGN') || "https://via.placeholder.com/120?text=CACHET";
-document.getElementById('logoPreview').src = currentLogo;
-document.getElementById('navLogo').src = currentLogo; 
-document.getElementById('signPreview').src = currentSign;
+
+let db = JSON.parse(localStorage.getItem('PRO_DB_V9')) || [];
+let config = JSON.parse(localStorage.getItem('PRO_CONFIG')) || { code: "1234" };
+let financeDB = JSON.parse(localStorage.getItem('PRO_FINANCE_V1')) || [];
+let currentId = null;
+
+window.onload = () => {
+    document.getElementById('loginLogo').src = currentLogo;
+    document.getElementById('navLogo').src = currentLogo;
+    document.getElementById('logoPreview').src = currentLogo;
+    document.getElementById('signPreview').src = currentSign;
+
+    const dernierGerant = localStorage.getItem('DERNIER_GERANT');
+    if (dernierGerant) {
+        document.getElementById('userGerant').value = dernierGerant;
+        document.getElementById('displayGerant').innerText = "GÉRANT : " + dernierGerant.toUpperCase();
+    }
+};
 
 function previewImage(input, type) {
     if (input.files && input.files[0]) {
@@ -320,6 +350,7 @@ function previewImage(input, type) {
                 currentLogo = e.target.result;
                 document.getElementById('logoPreview').src = currentLogo;
                 document.getElementById('navLogo').src = currentLogo;
+                document.getElementById('loginLogo').src = currentLogo;
                 localStorage.setItem('EKELEC_LOGO', currentLogo);
             } else {
                 currentSign = e.target.result;
@@ -331,25 +362,16 @@ function previewImage(input, type) {
     }
 }
 
-let db = JSON.parse(localStorage.getItem('PRO_DB_V9')) || [];
-let config = JSON.parse(localStorage.getItem('PRO_CONFIG')) || { code: "1234" };
-let financeDB = JSON.parse(localStorage.getItem('PRO_FINANCE_V1')) || [];
-let currentId = null;
-
-window.onload = () => {
-    const dernierGerant = localStorage.getItem('DERNIER_GERANT');
-    if (dernierGerant) {
-        document.getElementById('userGerant').value = dernierGerant;
-        document.getElementById('displayGerant').innerText = "GÉRANT : " + dernierGerant.toUpperCase();
-    }
-};
-
 function saveDB() { 
     localStorage.setItem('PRO_DB_V9', JSON.stringify(db)); 
     localStorage.setItem('PRO_FINANCE_V1', JSON.stringify(financeDB));
 }
 
-function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
+function openModal(id) { 
+    if(id === 'modalTransfert') prepareTransfert();
+    document.getElementById(id).classList.remove('hidden'); 
+    document.getElementById(id).classList.add('flex'); 
+}
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
 function goHome() { document.getElementById('viewAccueil').classList.remove('hidden'); document.getElementById('viewProjet').classList.add('hidden'); renderHome(); }
 function openProject(i) { currentId = i; document.getElementById('viewAccueil').classList.add('hidden'); document.getElementById('viewProjet').classList.remove('hidden'); document.getElementById('chantierTitre').innerText = db[i].nom; document.getElementById('chantierInfos').innerText = `${db[i].lieu || ''} | CLIENT: ${db[i].client || 'N/A'}`; renderJournal(); }
@@ -409,10 +431,22 @@ function renderHome(){
     db.forEach((c,i)=>{
         let inT=0, outT=0; c.flux.forEach(f=>{ inT+=f.e; outT+=f.s; });
         let soldeP = inT - outT;
+        
+        // Calcul pour la barre de progression
+        let pct = 0;
+        if(inT > 0) pct = Math.min((outT / inT) * 100, 100);
+        let barColor = pct > 90 ? 'bg-red-500' : 'bg-emerald-500';
+        let alertClass = pct > 90 ? 'alert-pulse' : '';
+
         if(!c.archive) { gRecu += inT; gDepense += outT; activeCount++; }
         if(c.nom.toLowerCase().includes(search)){
             let html = `<div class="glass p-6 relative cursor-pointer border-b-4 border-transparent hover:border-amber-500" onclick="openProject(${i})">
                 <h3 class="text-xl font-black text-amber-500 uppercase italic">${c.nom}</h3>
+                
+                <div class="w-full bg-slate-800 h-1.5 rounded-full mt-2 mb-4 overflow-hidden">
+                    <div class="${barColor} ${alertClass} h-full transition-all duration-500" style="width: ${pct}%"></div>
+                </div>
+
                 <div class="mt-4 space-y-1">
                     <div class="flex justify-between text-[10px] font-black"><span>REÇU:</span><span class="text-emerald-400">${inT.toLocaleString()} GNF</span></div>
                     <div class="flex justify-between text-[10px] font-black"><span>SORTIE:</span><span class="text-red-400">${outT.toLocaleString()} GNF</span></div>
@@ -459,7 +493,7 @@ function renderFinances() {
         </div>`;
     });
     document.getElementById('soldeGlobalFinances').innerText = totalGlobal.toLocaleString() + " GNF";
-    document.getElementById('soldeGlobalFinances').className = totalGlobal < 0 ? "text-2xl font-black text-red-500" : "text-2xl font-black text-amber-500";
+    document.getElementById('soldeGlobalFinances').className = totalGlobal < 0 ? "text-2xl font-black text-red-500" : "text-2xl font-black text-white";
     financeDB.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach((op, idx) => {
         table.innerHTML += `<tr class="border-b border-slate-700/30">
             <td class="p-3"><span class="font-black uppercase block">${op.compte}</span><span class="opacity-40 text-[8px]">${op.date}</span></td>
@@ -569,7 +603,7 @@ function editEntry(idx) {
         document.getElementById('fArtP').value = f.s / q; document.getElementById('fArtQ').value = q;
     }
     else if(f.type === 'OUVRIER') { document.getElementById('fOuvNom').value = f.on; document.getElementById('fOuvJob').value = f.oj; document.getElementById('fOuvC').value = f.oc; document.getElementById('fOuvA').value = f.s; updateOuvrierInfo(); }
-    else if(f.type === 'LOCATION') { document.getElementById('fLocNom').value = f.txt.split(" : ")[1].split(" (")[0]; document.getElementById('fLocBat').value = f.locBat; document.getElementById('fLocMois').value = f.locMois; document.getElementById('fLocRecu').value = f.e; document.getElementById('fLocPaye').value = f.s; }
+    else if(f.type === 'LOCATION') { const nom = document.getElementById('fLocNom').value.toUpperCase(); const bat = document.getElementById('fLocBat').value; const mois = document.getElementById('fLocMois').value; entry.e = parseNum(document.getElementById('fLocRecu').value); entry.s = parseNum(document.getElementById('fLocPaye').value); entry.locBat = bat; entry.locMois = mois; entry.txt = `LOCATION : ${nom} (BAT: ${bat}) - MOIS: ${mois}`; }
     openModal('modalSaisie');
 }
 
@@ -594,6 +628,57 @@ function deleteProject(e, i) { e.stopPropagation(); const codeCheck = prompt("S�
 function archiveProject(e, i) { e.stopPropagation(); if(confirm("Archiver ce projet ?")) { db[i].archive = true; saveDB(); renderHome(); } }
 function restoreProject(e, i) { e.stopPropagation(); if(confirm("Restaurer ce projet ?")) { db[i].archive = false; saveDB(); renderHome(); } }
 function toggleArchives() { const div = document.getElementById('listeArchives'); const text = document.getElementById('archiveText'); const icon = document.getElementById('archiveIcon'); if(div.classList.contains('hidden')) { div.classList.remove('hidden'); text.innerText = "Masquer les archives"; icon.classList.replace('fa-box-archive', 'fa-eye-slash'); } else { div.classList.add('hidden'); text.innerText = "Afficher les archives"; icon.classList.replace('fa-eye-slash', 'fa-box-archive'); } }
+
+function prepareTransfert() {
+    const sSource = document.getElementById('tSource');
+    const sDest = document.getElementById('tDest');
+    const infoSolde = document.getElementById('transfertSoldeInfo');
+    
+    sSource.innerHTML = '<option value="">-- Choisir Source --</option>';
+    sDest.innerHTML = '<option value="">-- Choisir Destination --</option>';
+    
+    db.forEach((c, i) => {
+        if(!c.archive) {
+            let opt = `<option value="${i}">${c.nom.toUpperCase()}</option>`;
+            sSource.innerHTML += opt;
+            sDest.innerHTML += opt;
+        }
+    });
+
+    // Écouteur pour mettre à jour le solde en temps réel
+    sSource.onchange = () => {
+        const idx = sSource.value;
+        if(idx !== "") {
+            let inT = 0, outT = 0;
+            db[idx].flux.forEach(f => { inT += f.e; outT += f.s; });
+            const solde = inT - outT;
+            infoSolde.innerText = `Solde disponible : ${solde.toLocaleString()} GNF`;
+            infoSolde.classList.remove('hidden');
+        } else {
+            infoSolde.classList.add('hidden');
+        }
+    };
+
+    infoSolde.classList.add('hidden');
+    document.getElementById('tDate').valueAsDate = new Date();
+}
+
+function executerTransfert() {
+    const idxS = document.getElementById('tSource').value;
+    const idxD = document.getElementById('tDest').value;
+    const montant = parseNum(document.getElementById('tMontant').value);
+    const compte = document.getElementById('tCompte').value;
+    const date = document.getElementById('tDate').value;
+
+    if(idxS === "" || idxD === "" || idxS === idxD || montant <= 0) {
+        alert("Veuillez vérifier les projets et le montant.");
+        return;
+    }
+    db[idxS].flux.push({ type: 'DIVERS', date: date, cat: 'TRANSFERT', compte: compte, e: 0, s: montant, txt: `TRANSFERT VERS : ${db[idxD].nom.toUpperCase()}` });
+    db[idxD].flux.push({ type: 'DIVERS', date: date, cat: 'TRANSFERT', compte: compte, e: montant, s: 0, txt: `TRANSFERT DEPUIS : ${db[idxS].nom.toUpperCase()}` });
+    saveDB(); renderHome(); closeModal('modalTransfert');
+    alert("Transfert effectué !");
+}
 
 function printReport() { 
     const c = db[currentId];
