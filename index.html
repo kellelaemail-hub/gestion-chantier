@@ -339,6 +339,17 @@ let config = JSON.parse(localStorage.getItem('PRO_CONFIG')) || { code: "1234" };
 let financeDB = JSON.parse(localStorage.getItem('PRO_FINANCE_V1')) || [];
 let currentId = null;
 
+function executePrint() {
+    if (window.Android && window.Android.print) {
+        // Mode APK : utilise le système Android
+        let content = document.getElementById('printArea').innerHTML;
+        window.Android.print(content);
+    } else {
+        // Mode Ordinateur : utilise le navigateur
+        window.print();
+    }
+}
+
 window.onload = () => {
     document.getElementById('loginLogo').src = currentLogo;
     document.getElementById('navLogo').src = currentLogo;
@@ -775,7 +786,7 @@ function printReport() {
         h += `<tr class="${rowClass}"><td>${f.date}</td><td><b>${f.txt}</b> <span class="cat-badge">${f.cat || 'GENERAL'}</span></td><td style="text-align:right">${f.e>0?f.e.toLocaleString():'-'}</td><td style="text-align:right">${sortieTxt}</td><td style="text-align:right; background:#f8fafc"><b>${soldeCaisse.toLocaleString()}</b></td></tr>`; 
     });
     h += `</tbody></table><div class="total-box total-depense-rouge">TOTAL DÉPENSÉ : ${to.toLocaleString()} GNF</div><div class="total-box">SOLDE NET EN CAISSE : ${(ti-to).toLocaleString()} GNF</div><div class="signature-area"><p style="font-size:10px; margin-bottom:5px;">Cachet & Signature :</p><img src="${currentSign}"></div></div>`;
-    document.getElementById('printContent').innerHTML = h; window.print(); 
+    document.getElementById('printContent').innerHTML = h; executePrint(); 
 }
 
 function printRecu(nomOuvrier) {
@@ -783,7 +794,7 @@ function printRecu(nomOuvrier) {
     let payeTotal = 0, contrat = 0, métier = "", history = "";
     c.flux.forEach(f => { if(f.type === 'OUVRIER' && f.on === nomOuvrier) { payeTotal += f.s; contrat = f.oc; métier = f.oj; history += `<tr><td>${f.date}</td><td>Acompte / Paiement</td><td style="text-align:right">${f.s.toLocaleString()} GNF</td></tr>`; } });
     let h = `<div style="padding:40px; color:#000; background:#fff; font-family:sans-serif;"><div class="report-header"><div><h1 class="report-title">REÇU DE PAIEMENT</h1><p class="recu-ouvrier-title">OUVRIER : <b>${nomOuvrier.toUpperCase()}</b></p></div><div style="text-align:right"><p class="info-line">DATE : ${new Date().toLocaleDateString()}</p></div></div><div style="margin-bottom:20px;"><p class="info-line">PROJET : <b>${c.nom.toUpperCase()}</b></p><p class="info-line">MÉTIER : <b>${métier.toUpperCase()}</b></p><p class="info-line">MONTANT CONTRAT : <b>${contrat.toLocaleString()} GNF</b></p></div><table><thead><tr><th>DATE</th><th>DESCRIPTION</th><th>MONTANT</th></tr></thead><tbody>${history}</tbody></table><div class="total-box">TOTAL PAYÉ : ${payeTotal.toLocaleString()} GNF</div><div class="total-box ${contrat-payeTotal > 0 ? 'total-depense-rouge' : ''}">RESTE À PAYER : ${(contrat-payeTotal).toLocaleString()} GNF</div><div class="signature-area"><img src="${currentSign}"></div></div>`;
-    document.getElementById('printContent').innerHTML = h; window.print();
+    document.getElementById('printContent').innerHTML = h; executePrint();
 }
 
 function printGlobalReport() { 
@@ -792,7 +803,7 @@ function printGlobalReport() {
     let h = `<div style="padding:30px; color:#000; background:#fff"><div class="report-header"><div><h1 class="report-title">BILAN GÉNÉRAL</h1><p class="info-line">GÉRANT : <b>${gerant}</b></p></div><div style="text-align:right"><p class="info-line">DATE : ${new Date().toLocaleDateString()}</p></div></div><table><thead><tr><th>CHANTIER</th><th>CLIENT</th><th style="text-align:right">REÇU</th><th style="text-align:right">DÉPENSÉ</th><th style="text-align:right">SOLDE</th></tr></thead><tbody>`;
     db.forEach(c => { if(!c.archive) { let inT=0, outT=0; c.flux.forEach(f=>{ inT+=f.e; outT+=f.s; }); gRecu += inT; gDepense += outT; h += `<tr><td><b>${c.nom.toUpperCase()}</b></td><td>${c.client.toUpperCase()}</td><td style="text-align:right">${inT.toLocaleString()}</td><td style="text-align:right">${outT.toLocaleString()}</td><td style="text-align:right"><b>${(inT-outT).toLocaleString()}</b></td></tr>`; } });
     h += `</tbody></table><div class="total-box">SOLDE GLOBAL (PROJETS ACTIFS) : ${(gRecu-gDepense).toLocaleString()} GNF</div><div class="signature-area"><img src="${currentSign}"></div></div>`;
-    document.getElementById('printContent').innerHTML = h; window.print();
+    document.getElementById('printContent').innerHTML = h; executePrint();
 }
 
 function exportData() {
