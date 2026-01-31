@@ -223,6 +223,7 @@ input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !impor
             <option value="BANQUE">BANQUE</option>
             <option value="PAYCARD">PAYCARD</option>
             <option value="AUTRES">AUTRES</option>
+            <option value="COMPTE EX">COMPTE EX</option>
         </select>
         <label class="text-[10px] font-black uppercase text-gray-500">Type de saisie</label>
         <select id="typeSaisie" onchange="toggleForm()" class="font-bold">
@@ -244,6 +245,9 @@ input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !impor
             <option value="MENUISERIE">Menuiserie</option>
             <option value="FORAGE">Forage</option>
             <option value="CARRELAGE">Carrelage</option>
+            <option value="VITRERIE">Vitrerie</option>
+            <option value="SOUDURE">Soudure</option>
+            <option value="STAFF">Staff</option>
         </select>
         <div id="formD"><input type="text" id="fMotif" placeholder="Désignation" autocomplete="off"><div class="grid grid-cols-2 gap-2"><input type="text" id="fE" placeholder="Reçu" autocomplete="off"><input type="text" id="fS" placeholder="Payé" autocomplete="off"></div></div>
         <div id="formA" class="hidden"><input type="text" id="fArtNom" placeholder="Nom article" autocomplete="off"><div class="grid grid-cols-2 gap-2"><input type="text" id="fArtP" placeholder="Prix Unit." autocomplete="off"><input type="text" id="fArtQ" placeholder="Quantité" autocomplete="off"></div></div>
@@ -285,6 +289,7 @@ input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !impor
                     <option value="BANQUE">BANQUE</option>
                     <option value="PAYCARD">PAYCARD</option>
                     <option value="AUTRES">AUTRES</option>
+                    <option value="COMPTE EX">COMPTE EX</option>
                 </select>
             </div>
             <input type="text" id="opMotif" placeholder="Motif de l'opération" autocomplete="off">
@@ -320,6 +325,7 @@ input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !impor
             <option value="BANQUE">BANQUE</option>
             <option value="PAYCARD">PAYCARD</option>
             <option value="AUTRES">AUTRES</option>
+            <option value="COMPTE EX">COMPTE EX</option>
         </select>
         <input type="text" id="tMontant" placeholder="MONTANT DU TRANSFERT">
         <input type="date" id="tDate">
@@ -481,7 +487,7 @@ function renderHome(){
         }
     });
     let totalComptes = 0;
-    ["ORANGE MONEY", "MOBILE MONEY", "BANQUE", "PAYCARD", "ESPECES", "AUTRES"].forEach(nom => { totalComptes += getSoldeCompte(nom); });
+    ["ORANGE MONEY", "MOBILE MONEY", "BANQUE", "PAYCARD", "COMPTE EX", "ESPECES", "AUTRES"].forEach(nom => { totalComptes += getSoldeCompte(nom); });
     document.getElementById('statTotalChantiers').innerText = activeCount;
     document.getElementById('statTotalRecu').innerText = gRecu.toLocaleString() + " GNF";
     document.getElementById('statTotalDepense').innerText = gDepense.toLocaleString() + " GNF";
@@ -502,7 +508,7 @@ function renderFinances() {
     const grid = document.getElementById('gridComptes');
     const table = document.getElementById('tableOpsBody');
     grid.innerHTML = ""; table.innerHTML = "";
-    const comptes = ["ORANGE MONEY", "MOBILE MONEY", "BANQUE", "PAYCARD", "ESPECES", "AUTRES"];
+    const comptes = ["ORANGE MONEY", "MOBILE MONEY", "BANQUE", "PAYCARD", "COMPTE EX", "ESPECES", "AUTRES"];
     let totalGlobal = 0;
     comptes.forEach(nom => {
         const s = getSoldeCompte(nom);
