@@ -346,7 +346,7 @@ let currentLogo = localStorage.getItem('EKELEC_LOGO') || "https://via.placeholde
 let currentSign = localStorage.getItem('EKELEC_SIGN') || "https://via.placeholder.com/120?text=CACHET";
 
 // On récupère les données existantes ou on crée un tableau vide
-let db = JSON.parse(localStorage.getItem('MON_APPLICATION_TRAVAUX')) || [];let config = JSON.parse(localStorage.getItem('PRO_CONFIG')) || { code: "1234" };
+let db = JSON.parse(localStorage.getItem('PRO_DB_V9')) || [];let config = JSON.parse(localStorage.getItem('PRO_CONFIG')) || { code: "1234" };
 let financeDB = JSON.parse(localStorage.getItem('PRO_FINANCE_V1')) || [];
 let currentId = null;
 
@@ -885,7 +885,7 @@ function reinitialiserTout() {
     }
 }
 function sauvegarderDonnees() {
-    localStorage.setItem('MON_APPLICATION_TRAVAUX', JSON.stringify(db));
+    localStorage.setItem('PRO_DB_V9', JSON.stringify(db));
 }
 </script>
 </body>
