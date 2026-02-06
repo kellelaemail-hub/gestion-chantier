@@ -9,7 +9,12 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 /* THEME KAKI / NOIR / BLANC */
-body { background: #0a0a0a; color: #f4f4f4; font-family: 'Inter', sans-serif; }
+body { background: #0a0a0a; color: #f4f4f4; font-family: 'Arial Narrow', sans-serif !important;
+font-size: 14px !important; /* Pour respecter la taille 14 demandée */ 
+}
+input, select, button { 
+    font-family: 'Arial Narrow', sans-serif !important; 
+}
 .glass { background: #171717; border: 1px solid #262626; border-radius: 20px; transition:0.3s; }
 input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !important; color: white !important; padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 10px; outline: none; }
 .btn-gold { background: #6b705c; color: white; font-weight: bold; text-transform: uppercase; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; transition: 0.3s; border:none; }
@@ -340,8 +345,8 @@ input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !impor
 let currentLogo = localStorage.getItem('EKELEC_LOGO') || "https://via.placeholder.com/120?text=LOGO";
 let currentSign = localStorage.getItem('EKELEC_SIGN') || "https://via.placeholder.com/120?text=CACHET";
 
-let db = JSON.parse(localStorage.getItem('PRO_DB_V9')) || [];
-let config = JSON.parse(localStorage.getItem('PRO_CONFIG')) || { code: "1234" };
+// On récupère les données existantes ou on crée un tableau vide
+let db = JSON.parse(localStorage.getItem('MON_APPLICATION_TRAVAUX')) || [];let config = JSON.parse(localStorage.getItem('PRO_CONFIG')) || { code: "1234" };
 let financeDB = JSON.parse(localStorage.getItem('PRO_FINANCE_V1')) || [];
 let currentId = null;
 
@@ -778,7 +783,18 @@ function printReport() {
     const c = db[currentId];
     let ti = 0, to = 0, soldeCaisse = 0; let ouvriersSuivi = {}; 
     const gerant = document.getElementById('userGerant').value.toUpperCase();
-    let h = `<div style="padding:30px; background:#fff; color:#000"><div class="report-header"><div class="info-block"><h1 class="report-title">RAPPORT D'ACTIVITÉ ${c.archive ? '(ARCHIVÉ)' : ''}</h1><span class="info-line">PROJET : <b>${c.nom.toUpperCase()}</b></span><span class="info-line">CLIENT : <b>${c.client.toUpperCase() || 'N/A'}</b></span></div><div class="info-block" style="text-align:right;"><span class="info-line">LIEU : <b>${c.lieu.toUpperCase() || 'N/A'}</b></span><span class="info-line">GÉRANT : <b>${gerant}</b></span><span class="info-line">DATE : <b>${new Date().toLocaleDateString()}</b></span></div></div><table><thead><tr><th>DATE</th><th>LIBELLÉ (CATÉGORIE)</th><th>ENTRÉE</th><th>SORTIE</th><th>SOLDE</th></tr></thead><tbody>`; 
+    let h = `<div style="padding:30px; background:#fff; color:#000"><div class="report-header">
+    <div class="info-block">
+        <h1 class="report-title">RAPPORT D'ACTIVITÉ ${c.archive ? '(ARCHIVÉ)' : ''}</h1>
+        <span class="info-line">PROJET : <b>${c.nom.toUpperCase()}</b></span>
+        <span class="info-line">LIEU : <b>${c.lieu.toUpperCase() || 'N/A'}</b></span>
+        <span class="info-line">CLIENT : <b>${c.client.toUpperCase() || 'N/A'}</b></span>
+    </div>
+    <div class="info-block" style="text-align:right;">
+        <span class="info-line">DATE : <b>${new Date().toLocaleDateString()}</b></span>
+        <span class="info-line">GÉRANT : <b>${gerant}</b></span>
+    </div>
+</div><table><thead><tr><th>DATE</th><th>LIBELLÉ (CATÉGORIE)</th><th>ENTRÉE</th><th>SORTIE</th><th>SOLDE</th></tr></thead><tbody>`; 
     c.flux.forEach((f) => { 
         ti += f.e; to += f.s; soldeCaisse += (f.e - f.s); 
         let rowClass = f.e > 0 ? 'row-entree' : (f.s > 0 ? 'row-sortie' : '');
@@ -867,6 +883,9 @@ function reinitialiserTout() {
     } else if (codeCheck !== null) {
         alert("CODE INCORRECT");
     }
+}
+function sauvegarderDonnees() {
+    localStorage.setItem('MON_APPLICATION_TRAVAUX', JSON.stringify(db));
 }
 </script>
 </body>
