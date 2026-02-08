@@ -156,15 +156,19 @@ input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !impor
 </div>
 
        <div id="viewProjet" class="hidden">
-    <div class="sticky-projet-header" style="position: sticky; top: 60px; z-index: 100; background: #0a0a0a; padding-bottom: 15px;">
+    <div class="sticky-projet-header" style="position: sticky; top: 0px !important; z-index: 100; background: #0a0a0a; padding-bottom: 15px;">
+        
         <button onclick="goHome()" class="text-gray-500 mb-2 text-[9px] font-black uppercase flex items-center gap-2 hover:text-white transition">
             <i class="fa-solid fa-chevron-left"></i> Retour au tableau de bord
         </button>
 
-        <div class="glass p-6 border-l-[12px] border-[#6b705c] shadow-2xl relative">
-            <h1 id="chantierTitre" class="text-2xl font-black text-[#a5a58d] uppercase italic leading-none mb-1" style="padding-right: 110px;"></h1>
-            <p id="chantierInfos" class="text-[10px] opacity-60 font-bold uppercase mb-4" style="padding-right: 110px;"></p>
+        <div class="glass p-6 border-l-[12px] border-[#6b705c] shadow-2xl relative" style="display: flex; flex-direction: column; min-height: 120px;">
             
+            <div style="max-width: 65%;">
+                <h1 id="chantierTitre" class="text-2xl font-black text-[#a5a58d] uppercase italic leading-tight mb-1"></h1>
+                <p id="chantierInfos" class="text-[10px] opacity-60 font-bold uppercase mb-4"></p>
+            </div>
+
             <div class="flex flex-wrap gap-3">
                 <button onclick="openSaisie()" class="bg-emerald-700 hover:bg-emerald-600 px-6 py-3 rounded-xl text-[10px] font-black uppercase shadow-lg border border-emerald-500/20">
                     <i class="fa-solid fa-plus mr-2"></i>Nouvelle Saisie
@@ -174,9 +178,9 @@ input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !impor
                 </button>
             </div>
 
-            <div class="absolute right-6 top-6 text-right">
+            <div style="position: absolute; right: 15px; top: 20px; text-align: right;">
                 <p class="text-[9px] uppercase font-black opacity-30">Solde Caisse</p>
-                <p id="soldeChantier" class="text-3xl font-black text-emerald-500">0 GNF</p>
+                <p id="soldeChantier" class="text-2xl font-black text-emerald-500" style="margin: 0; line-height: 1;">0 GNF</p>
             </div>
         </div>
     </div>
