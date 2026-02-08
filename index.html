@@ -7,6 +7,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 /* THEME KAKI / NOIR / BLANC */
 body { background: #0a0a0a; color: #f4f4f4; font-family: 'Arial Narrow', sans-serif !important;
@@ -14,6 +15,29 @@ font-size: 14px !important; /* Pour respecter la taille 14 demandée */
 }
 input, select, button { 
     font-family: 'Arial Narrow', sans-serif !important; 
+}
+/* Permet de fixer le haut et de scroller uniquement le contenu */
+.sticky-header {
+    position: sticky;
+    top: 70px; /* Juste en dessous de la nav principale */
+    z-index: 40;
+    background: #0a0a0a;
+    padding-bottom: 10px;
+}
+/* Bloc projet qui reste fixe en haut */
+.sticky-projet-header {
+    position: sticky;
+    top: 64px; /* Ajusté pour coller sous la barre EKELEC */
+    z-index: 40;
+    background: #0a0a0a; /* Fond noir pour cacher les chiffres qui passent dessous */
+    padding-top: 10px;
+    padding-bottom: 15px;
+    margin-top: -10px; /* Compense le padding pour éviter un saut */
+}
+
+/* Optionnel : pour rendre le scroll plus fluide sur mobile */
+#listeChantiers, #listeArchives {
+    overflow-y: visible;
 }
 .glass { background: #171717; border: 1px solid #262626; border-radius: 20px; transition:0.3s; }
 input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !important; color: white !important; padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 10px; outline: none; }
@@ -84,60 +108,80 @@ input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !impor
 
     <div class="p-4 max-w-6xl mx-auto">
         <div id="viewAccueil">
-            <div class="flex justify-between items-end mb-4">
-                <h2 class="text-[10px] font-black uppercase tracking-[3px] text-gray-500">Tableau de bord</h2>
-                <button onclick="printGlobalReport()" class="bg-neutral-800 hover:bg-neutral-700 px-4 py-2 rounded-lg text-[10px] font-black uppercase flex items-center gap-2 border border-neutral-700">
-                    <i class="fa-solid fa-print"></i> Bilan Global
-                </button>
-            </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div class="glass p-4 border-b-4 border-gray-500"><p class="text-[9px] uppercase font-black text-gray-500">Projets Actifs</p><p id="statTotalChantiers" class="text-2xl font-black text-white">0</p></div>
-                <div class="glass p-4 border-b-4 border-emerald-600"><p class="text-[9px] uppercase font-black text-gray-500">Total Reçu</p><p id="statTotalRecu" class="text-xl font-black text-emerald-500">0 GNF</p></div>
-                <div class="glass p-4 border-b-4 border-red-600"><p class="text-[9px] uppercase font-black text-gray-500">Total Dépensé</p><p id="statTotalDepense" class="text-xl font-black text-red-500">0 GNF</p></div>
-                <div class="glass p-4 border-b-4 border-[#6b705c]"><p class="text-[9px] uppercase font-black text-gray-500">Solde Comptes</p><p id="statTotalSoldeComptes" class="text-xl font-black text-[#a5a58d]">0 GNF</p></div>
-            </div>
-            <div class="flex justify-between items-center mb-6 gap-4">
-                <input type="text" id="searchHome" oninput="renderHome()" placeholder="Rechercher..." class="max-w-xs mb-0" autocomplete="off">
-                <div class="flex gap-2">
-                    <button onclick="openFinances()" class="bg-neutral-700 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg flex items-center gap-2 transition hover:bg-neutral-600"><i class="fa-solid fa-wallet"></i> Opérations</button>
-                    <button onclick="openModal('modalTransfert')" class="bg-neutral-800 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg flex items-center gap-2 transition hover:bg-neutral-700 border border-neutral-600"><i class="fa-solid fa-exchange-alt"></i> Transfert</button>
-                    <button onclick="viderChantier(); openModal('modalChantier')" class="bg-[#6b705c] text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg hover:bg-[#a5a58d]">+ Nouveau Projet</button>
-                </div>
-            </div>
-            <div id="listeChantiers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-            <div class="mt-12 pt-8 border-t border-neutral-800">
-                <div class="flex justify-between items-center">
-                    <button onclick="toggleArchives()" class="text-gray-500 hover:text-[#a5a58d] text-[10px] font-black uppercase flex items-center gap-2">
-                        <i id="archiveIcon" class="fa-solid fa-box-archive"></i> <span id="archiveText">Afficher les archives</span>
-                    </button>
-                    <button id="btnClearArchives" onclick="clearArchives()" class="hidden text-red-500 hover:text-red-400 text-[10px] font-black uppercase flex items-center gap-2">
-                        <i class="fa-solid fa-trash-can"></i> Supprimer les archives
-                    </button>
-                </div>
-                <div id="listeArchives" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 opacity-60"></div>
-            </div>
+    <div class="sticky-header">
+        <div class="flex justify-between items-end mb-4">
+            <h2 class="text-[10px] font-black uppercase tracking-[3px] text-gray-500">Tableau de bord</h2>
+            <button onclick="printGlobalReport()" class="bg-neutral-800 hover:bg-neutral-700 px-4 py-2 rounded-lg text-[10px] font-black uppercase flex items-center gap-2 border border-neutral-700">
+                <i class="fa-solid fa-print"></i> Bilan Global
+            </button>
         </div>
 
-        <div id="viewProjet" class="hidden">
-            <button onclick="goHome()" class="text-gray-400 mb-6 text-[10px] font-black uppercase flex items-center gap-2 hover:text-white transition"><i class="fa-solid fa-chevron-left"></i> Retour</button>
-            <div class="glass p-8 mb-6 border-l-[12px] border-[#6b705c] shadow-2xl relative">
-                <h1 id="chantierTitre" class="text-3xl font-black text-[#a5a58d] uppercase italic leading-none mb-2"></h1>
-                <p id="chantierInfos" class="text-[11px] opacity-60 font-bold uppercase mb-6"></p>
-                <div class="flex flex-wrap gap-3">
-                    <button onclick="openSaisie()" class="bg-emerald-700 hover:bg-emerald-600 px-6 py-3 rounded-xl text-[10px] font-black uppercase shadow-lg">Nouvelle Saisie</button>
-                    <button onclick="printReport()" class="bg-neutral-700 hover:bg-neutral-600 px-6 py-3 rounded-xl text-[10px] font-black uppercase shadow-lg">Imprimer Rapport</button>
-                </div>
-                <div class="absolute right-8 top-8 text-right">
-                    <p class="text-[10px] uppercase font-black opacity-30">Solde Caisse</p>
-                    <p id="soldeChantier" class="text-4xl font-black text-emerald-500">0 GNF</p>
-                </div>
+        <div class="grid grid-cols-2 md:grid-cols-2 gap-4 mb-6">
+            <div class="glass p-4 border-b-4 border-gray-500"><p class="text-[9px] uppercase font-black text-gray-500">Projets Actifs</p><p id="statTotalChantiers" class="text-2xl font-black text-white">0</p></div>
+            <div class="glass p-4 border-b-4 border-emerald-600"><p class="text-[9px] uppercase font-black text-gray-500">Total Reçu</p><p id="statTotalRecu" class="text-xl font-black text-emerald-500">0 GNF</p></div>
+            <div class="glass p-4 border-b-4 border-red-600"><p class="text-[9px] uppercase font-black text-gray-500">Total Dépensé</p><p id="statTotalDepense" class="text-xl font-black text-red-500">0 GNF</p></div>
+            <div class="glass p-4 border-b-4 border-[#6b705c]"><p class="text-[9px] uppercase font-black text-gray-500">Solde Comptes</p><p id="statTotalSoldeComptes" class="text-xl font-black text-[#a5a58d]">0 GNF</p></div>
+        </div>
+
+        <div class="flex flex-wrap justify-between items-center gap-4 bg-black/80 backdrop-blur-md p-2 rounded-xl border border-white/5">
+            <input type="text" id="searchHome" oninput="renderHome()" placeholder="Rechercher un projet..." class="max-w-xs mb-0" autocomplete="off">
+            <div class="flex gap-2">
+                <button onclick="openFinances()" class="bg-neutral-700 text-white px-4 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg flex items-center gap-2 transition hover:bg-neutral-600"><i class="fa-solid fa-wallet"></i></button>
+                <button onclick="openModal('modalTransfert')" class="bg-neutral-800 text-white px-4 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg flex items-center gap-2 transition hover:bg-neutral-700 border border-neutral-600"><i class="fa-solid fa-exchange-alt"></i></button>
+                <button onclick="viderChantier(); openModal('modalChantier')" class="bg-[#6b705c] text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg hover:bg-[#a5a58d]">+ Nouveau Projet</button>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        </div>
+    </div>
+
+    <div id="listeChantiers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"></div>
+    
+    <div class="mt-12 pt-8 border-t border-neutral-800">
+        <div class="flex justify-between items-center">
+            <button onclick="toggleArchives()" class="text-gray-500 hover:text-[#a5a58d] text-[10px] font-black uppercase flex items-center gap-2">
+                <i id="archiveIcon" class="fa-solid fa-box-archive"></i> <span id="archiveText">Afficher les archives</span>
+            </button>
+            <button id="btnClearArchives" onclick="clearArchives()" class="hidden text-red-500 hover:text-red-400 text-[10px] font-black uppercase flex items-center gap-2">
+                <i class="fa-solid fa-trash-can"></i> Supprimer les archives
+            </button>
+        </div>
+        <div id="listeArchives" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 opacity-60"></div>
+    </div>
+</div>
+
+       <div id="viewProjet" class="hidden">
+    <div class="sticky-projet-header" style="position: sticky; top: 60px; z-index: 100; background: #0a0a0a; padding-bottom: 15px;">
+        <button onclick="goHome()" class="text-gray-500 mb-2 text-[9px] font-black uppercase flex items-center gap-2 hover:text-white transition">
+            <i class="fa-solid fa-chevron-left"></i> Retour au tableau de bord
+        </button>
+
+        <div class="glass p-6 border-l-[12px] border-[#6b705c] shadow-2xl relative">
+            <h1 id="chantierTitre" class="text-2xl font-black text-[#a5a58d] uppercase italic leading-none mb-1"></h1>
+            <p id="chantierInfos" class="text-[10px] opacity-60 font-bold uppercase mb-4"></p>
+            
+            <div class="flex flex-wrap gap-3">
+                <button onclick="openSaisie()" class="bg-emerald-700 hover:bg-emerald-600 px-6 py-3 rounded-xl text-[10px] font-black uppercase shadow-lg border border-emerald-500/20">
+                    <i class="fa-solid fa-plus mr-2"></i>Nouvelle Saisie
+                </button>
+                <button onclick="printReport()" class="bg-neutral-800 hover:bg-neutral-700 px-6 py-3 rounded-xl text-[10px] font-black uppercase shadow-lg border border-neutral-700">
+                    <i class="fa-solid fa-print mr-2"></i>Imprimer Rapport
+                </button>
+            </div>
+
+            <div class="absolute right-6 top-6 text-right">
+                <p class="text-[9px] uppercase font-black opacity-30">Solde Caisse</p>
+                <p id="soldeChantier" class="text-3xl font-black text-emerald-500">0 GNF</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-4">
+ 
                 <div class="lg:col-span-1 space-y-6">
                     <div class="glass p-5">
                         <h3 class="text-[11px] font-black text-[#a5a58d] uppercase mb-5">Suivi Personnel</h3>
                         <div id="listeOuvriers" class="space-y-4"></div>
                     </div>
+					
                     <div class="glass p-5">
                         <h3 class="text-[11px] font-black text-gray-400 uppercase mb-5">Bilans Catégories</h3>
                         <div id="bilanCategories" class="space-y-2 text-[10px] font-bold uppercase"></div>
@@ -278,43 +322,62 @@ input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !impor
 </div>
 
 <div id="modalFinances" class="fixed inset-0 bg-black/95 hidden items-center justify-center p-4 z-[100] backdrop-blur-md">
-    <div class="glass p-8 w-full max-w-2xl border-t-[10px] border-[#6b705c] shadow-2xl overflow-y-auto max-h-[90vh]">
-        <h3 class="font-black mb-4 uppercase text-[#a5a58d] italic text-xl flex justify-between items-center">
-            <span>Opérations Financières</span>
-            <div class="flex items-center gap-4">
-                <span id="soldeGlobalFinances" class="text-2xl font-black text-white">0 GNF</span>
-                <button onclick="closeModal('modalFinances')" class="text-gray-500 hover:text-white text-3xl font-light">&times;</button>
+    <div class="glass w-full max-w-2xl border-t-[10px] border-[#6b705c] shadow-2xl flex flex-col max-h-[90vh]">
+        
+        <div class="p-8 pb-4">
+            <h3 class="font-black mb-4 uppercase text-[#a5a58d] italic text-xl flex justify-between items-center">
+                <span>Opérations Financières</span>
+                <div class="flex items-center gap-4">
+                    <span id="soldeGlobalFinances" class="text-2xl font-black text-white">0 GNF</span>
+                    <button onclick="closeModal('modalFinances')" class="text-gray-500 hover:text-white text-3xl font-light">&times;</button>
+                </div>
+            </h3>
+
+            <div id="gridComptes" class="grid grid-cols-2 md:grid-cols-2 gap-2 mb-6"></div>
+
+            <div class="bg-black/50 p-6 rounded-xl border border-neutral-800">
+                <input type="hidden" id="editOpIndex">
+                <div class="grid grid-cols-2 gap-2">
+                    <select id="opType" class="font-bold"><option value="DEPOT">DÉPÔT (+)</option><option value="RETRAIT">RETRAIT (-)</option></select>
+                    <select id="opCompte" class="font-bold">
+                        <option value="ESPECES">ESPÈCES</option>
+                        <option value="ORANGE MONEY">ORANGE MONEY</option>
+                        <option value="MOBILE MONEY">MOBILE MONEY</option>
+                        <option value="BANQUE">BANQUE</option>
+                        <option value="PAYCARD">PAYCARD</option>
+                        <option value="AUTRES">AUTRES</option>
+                        <option value="COMPTE EX">COMPTE EX</option>
+                    </select>
+                </div>
+                <input type="text" id="opMotif" placeholder="Motif de l'opération" autocomplete="off">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="opMontant" placeholder="Montant">
+                    <input type="date" id="opDate">
+                </div>
+                <button onclick="saveOperationFinanciere()" class="btn-gold w-full mt-2">ENREGISTRER L'OPÉRATION</button>
             </div>
-        </h3>
-        <div id="gridComptes" class="grid grid-cols-2 md:grid-cols-3 gap-2 mb-6"></div>
-        <div class="bg-black/50 p-6 rounded-xl border border-neutral-800 mb-6">
-            <input type="hidden" id="editOpIndex">
-            <div class="grid grid-cols-2 gap-2">
-                <select id="opType" class="font-bold"><option value="DEPOT">DÉPÔT (+)</option><option value="RETRAIT">RETRAIT (-)</option></select>
-                <select id="opCompte" class="font-bold">
-                    <option value="ESPECES">ESPÈCES</option>
-                    <option value="ORANGE MONEY">ORANGE MONEY</option>
-                    <option value="MOBILE MONEY">MOBILE MONEY</option>
-                    <option value="BANQUE">BANQUE</option>
-                    <option value="PAYCARD">PAYCARD</option>
-                    <option value="AUTRES">AUTRES</option>
-                    <option value="COMPTE EX">COMPTE EX</option>
-                </select>
-            </div>
-            <input type="text" id="opMotif" placeholder="Motif de l'opération" autocomplete="off">
-            <div class="grid grid-cols-2 gap-2">
-                <input type="text" id="opMontant" placeholder="Montant">
-                <input type="date" id="opDate">
-            </div>
-            <button onclick="saveOperationFinanciere()" class="btn-gold w-full mt-2">ENREGISTRER L'OPÉRATION</button>
         </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-[10px]">
-                <thead class="bg-neutral-900 uppercase font-black"><tr><th class="p-3">Compte</th><th class="p-3">Motif</th><th class="p-3">Montant</th><th class="p-3 text-right">Action</th></tr></thead>
-                <tbody id="tableOpsBody"></tbody>
-            </table>
+
+        <div class="flex-1 overflow-y-auto px-8 pb-4">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-[10px]">
+                    <thead class="bg-neutral-900 uppercase font-black sticky top-0 z-10">
+                        <tr>
+                            <th class="p-3">Compte</th>
+                            <th class="p-3">Motif</th>
+                            <th class="p-3">Montant</th>
+                            <th class="p-3 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableOpsBody">
+                        </tbody>
+                </table>
+            </div>
         </div>
-        <button onclick="closeModal('modalFinances')" class="w-full mt-6 text-[10px] opacity-40 uppercase font-black">Fermer</button>
+
+        <div class="px-8 py-4 border-t border-white/5">
+            <button onclick="closeModal('modalFinances')" class="w-full text-[10px] opacity-40 uppercase font-black hover:opacity-100 transition">Fermer la fenêtre</button>
+        </div>
     </div>
 </div>
 
