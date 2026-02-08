@@ -17,29 +17,36 @@ input, select, button {
     font-family: 'Arial Narrow', sans-serif !important; 
 }
 /* Permet de fixer le haut et de scroller uniquement le contenu */
+/* 1. La barre du haut : on la colle vraiment au plafond */
 .sticky-header {
     position: sticky;
-    top: 70px; /* Juste en dessous de la nav principale */
-    z-index: 40;
+    top: 0; 
+    z-index: 50;
     background: #0a0a0a;
     padding-bottom: 10px;
 }
-/* Bloc projet qui reste fixe en haut */
+
+/* 2. Le titre du projet : on l'ajuste pour qu'il ne glisse pas dessous */
 .sticky-projet-header {
     position: sticky;
-    top: 64px; /* Ajusté pour coller sous la barre EKELEC */
+    top: 55px; /* On le descend pour qu'il soit bien sous le menu */
     z-index: 40;
-    background: #0a0a0a; /* Fond noir pour cacher les chiffres qui passent dessous */
+    background: #0a0a0a;
     padding-top: 10px;
     padding-bottom: 15px;
-    margin-top: -10px; /* Compense le padding pour éviter un saut */
 }
 
 /* Optionnel : pour rendre le scroll plus fluide sur mobile */
 #listeChantiers, #listeArchives {
     overflow-y: visible;
 }
-.glass { background: #171717; border: 1px solid #262626; border-radius: 20px; transition:0.3s; }
+.glass { 
+    background: #171717; 
+    border: 1px solid #262626; 
+    border-radius: 20px; 
+    transition: 0.3s;
+    margin-bottom: 15px; /* Cela crée l'espace entre tes cadres */
+}
 input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !important; color: white !important; padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 10px; outline: none; }
 .btn-gold { background: #6b705c; color: white; font-weight: bold; text-transform: uppercase; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; transition: 0.3s; border:none; }
 .btn-gold:hover { background: #a5a58d; transform: translateY(-2px); }
