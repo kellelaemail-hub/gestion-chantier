@@ -87,11 +87,39 @@ input, select {
 
 /* --- GESTION DES COULEURS COMPTA --- */
 .row-entree, .montant-entree { color: #008000 !important; font-weight: bold; } 
-.row-sortie, .montant-sortie { color: #ff0000 !important; font-weight: bold; } 
-#soldeChantier { color: #0000ff !important; font-weight: 900; }
+.row-sortie, .montant-sortie { color: #ff0000 !important; font-weight: bold; }
+/* ICI : On force le solde à être bien visible en BLEU sur fond blanc */
+#soldeChantier { 
+    color: #0000FF !important; /* Bleu intense */
+    font-weight: 900; 
+    display: block !important; /* Force l'affichage */
+    visibility: visible !important;
+}
 .solde-vide, .solde-negatif { color: #ff0000 !important; }
 
-#logoPreview, #signPreview { max-width: 120px; max-height: 120px; margin: 0 auto 15px; display: block; object-fit: contain; }
+/* Si le solde est vide ou négatif, il passera en rouge via le JS */
+.solde-vide, .solde-negatif { 
+    color: #ff0000 !important; 
+    font-weight: 900;
+}
+/* --- CORRECTION VISIBILITÉ TABLEAU (BRIQUE VALIDÉE) --- */
+/* Force le texte du tableau en noir car il était en blanc */
+#tableBody tr td {
+    color: #000000 !important;
+}
+
+/* Force le solde progressif (dernière colonne) en Bleu */
+#tableBody tr td:nth-child(5) {
+    color: #0000ff !important;
+    font-weight: 900 !important;
+}
+
+/* On s'assure que les en-têtes sont lisibles */
+thead.bg-neutral-900 th {
+    background: #f0f0f0 !important;
+    color: #000000 !important;
+    border-bottom: 2px solid #000000;
+}
 
 @media (max-width: 768px) {
     #viewProjet .glass.p-8 { position: relative; padding: 20px !important; }
@@ -129,6 +157,18 @@ input, select {
 
 /* Force les textes spécifiques en noir */
 #nbProjetsActifs, #bilanCategories, .sticky-header *, .sticky-projet-header * { color: #000000 !important; }
+/* --- COULEUR DES COMPTES (ORANGE MONEY, BANQUE, CAISSE) --- */
+#bilanCategories div div, 
+#bilanCategories b, 
+#bilanCategories strong {
+    color: #FF8C00 !important; /* <--- ICI : J'ai mis un Orange foncé pour l'exemple */
+    text-transform: uppercase;
+}
+
+#bilanCategories span {
+    color: #000000 !important; /* <--- ICI : Le montant reste en noir */
+    font-weight: 900;
+}
 </style>
 </head>
 <body onkeydown="if(event.key==='Enter') validerParEntree()">
@@ -204,7 +244,7 @@ input, select {
 </div>
 
        <div id="viewProjet" class="hidden">
-    <div class="sticky-projet-header" style="position: sticky; top: 60px; z-index: 100; background: #0a0a0a; padding-bottom: 15px;">
+    <div class="sticky-projet-header" style="position: sticky; top: 60px; z-index: 100; background: #ffffff; padding-bottom: 15px;">
         <button onclick="goHome()" class="text-gray-500 mb-2 text-[9px] font-black uppercase flex items-center gap-2 hover:text-white transition">
             <i class="fa-solid fa-chevron-left"></i> Retour au tableau de bord
         </button>
@@ -640,13 +680,15 @@ function renderFinances() {
     comptes.forEach(nom => {
         const s = getSoldeCompte(nom);
         totalGlobal += s;
-        grid.innerHTML += `<div class="glass p-3 bg-neutral-900 border-l-4 ${s < 0 ? 'border-red-600' : 'border-emerald-600'}">
-            <p class="text-[8px] font-black uppercase opacity-50">${nom}</p>
-            <p class="text-[11px] font-black ${s < 0 ? 'text-red-400' : 'text-white'}">${s.toLocaleString()} GNF</p>
+        // On change bg-neutral-900 par bg-white (fond blanc)
+        // On change text-white par text-black (écriture noire)
+        grid.innerHTML += `<div class="glass p-3 bg-white border-l-4 ${s < 0 ? 'border-red-600' : 'border-emerald-600'}">
+            <p class="text-[10px] font-black uppercase" style="color: #000000 !important;">${nom}</p>
+            <p class="text-[12px] font-black" style="color: ${s < 0 ? '#ff0000' : '#0000ff'} !important;">${s.toLocaleString()} GNF</p>
         </div>`;
     });
     document.getElementById('soldeGlobalFinances').innerText = totalGlobal.toLocaleString() + " GNF";
-    document.getElementById('soldeGlobalFinances').className = totalGlobal < 0 ? "text-2xl font-black text-red-500" : "text-2xl font-black text-white";
+    document.getElementById('soldeGlobalFinances').className = totalGlobal < 0 ? "text-2xl font-black text-red-500" : "text-2xl font-black text-blue-600";
     financeDB.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach((op, idx) => {
         table.innerHTML += `<tr class="border-b border-neutral-800">
             <td class="p-3"><span class="font-black uppercase block">${op.compte}</span><span class="opacity-40 text-[8px]">${op.date}</span></td>
@@ -712,21 +754,29 @@ function renderJournal(){
             if(!workers[f.on]) workers[f.on]={job:f.oj, contrat:f.oc, paye:0};
             workers[f.on].paye += f.s;
         }
-        tbody.innerHTML += `<tr>
-            <td class="p-5 font-bold uppercase">${f.txt}<br><span class="opacity-30 text-[9px] mr-2">${f.date}</span> <span class="text-[8px] font-black bg-neutral-800 px-2 py-0.5 rounded text-[#a5a58d]">${f.cat || 'GENERAL'}</span></td>
-            <td class="p-5 font-black opacity-60 text-[10px] uppercase">${f.compte || 'ESPECES'}</td>
-            <td class="p-5 text-emerald-500 font-black">${f.e>0?f.e.toLocaleString():'-'}</td>
-            <td class="p-5 text-red-500 font-black">${f.s>0?f.s.toLocaleString():'-'}</td>
-            <td class="p-5 font-black text-white">${runningSolde.toLocaleString()}</td>
+        tbody.innerHTML += `<tr class="border-b border-gray-200">
+            <td class="p-5 font-bold uppercase" style="color: #000000;">${f.txt}<br><span class="opacity-50 text-[9px] mr-2">${f.date}</span> <span class="text-[8px] font-black bg-gray-200 px-2 py-0.5 rounded text-black">${f.cat || 'GENERAL'}</span></td>
+            <td class="p-5 font-black opacity-60 text-[10px] uppercase" style="color: #000000;">${f.compte || 'ESPECES'}</td>
+            <td class="p-5 text-emerald-600 font-black">${f.e > 0 ? f.e.toLocaleString() : '-'}</td>
+            <td class="p-5 text-red-600 font-black">${f.s > 0 ? f.s.toLocaleString() : '-'}</td>
+            <td class="p-5 font-black text-blue-700">${runningSolde.toLocaleString()}</td>
             <td class="p-5 text-center flex gap-4 justify-center">
-                <button onclick="editEntry(${idx})" class="text-blue-500"><i class="fa-solid fa-pen"></i></button>
-                <button onclick="deleteEntry(${idx})" class="text-neutral-600 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                <button onclick="editEntry(${idx})" class="text-blue-600"><i class="fa-solid fa-pen"></i></button>
+                <button onclick="deleteEntry(${idx})" class="text-gray-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
             </td>
         </tr>`;
     });
     for(let k in cats) { if(cats[k] > 0) divBilan.innerHTML += `<div class="flex justify-between border-b border-neutral-800 pb-1"><span>${k}</span><span class="text-gray-400">${cats[k].toLocaleString()} GNF</span></div>`; }
     for(let it in items) { divInv.innerHTML += `<div class="flex justify-between border-b border-neutral-800 pb-1"><span>${it}</span><span class="text-emerald-500">x ${items[it]}</span></div>`; }
-    document.getElementById('soldeChantier').innerText = runningSolde.toLocaleString() + " GNF";
+    // Mise à jour du solde avec couleur dynamique
+    const elSolde = document.getElementById('soldeChantier');
+    elSolde.innerText = runningSolde.toLocaleString() + " GNF";
+    
+    if (runningSolde < 0) {
+        elSolde.style.color = "#ff0000"; // Rouge si négatif
+    } else {
+        elSolde.style.color = "#0000ff"; // Bleu si positif
+    }
     for(let n in workers){
         let r = workers[n].contrat - workers[n].paye;
         lOuv.innerHTML += `<div class="bg-black/50 p-4 rounded-xl border-l-4 border-[#6b705c]">
