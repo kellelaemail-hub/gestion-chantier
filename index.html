@@ -7,57 +7,101 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-/* THEME KAKI / NOIR / BLANC */
-body { background: #0a0a0a; color: #f4f4f4; font-family: 'Arial Narrow', sans-serif !important;
-font-size: 14px !important; /* Pour respecter la taille 14 demandée */ 
+
+/* --- FOND BLANC ET TEXTE NOIR --- */
+body { 
+    background: #ffffff; 
+    color: #000000; 
+    font-family: 'Arial Narrow', sans-serif !important;
+    font-size: 14px !important; 
 }
-input, select, button { 
-    font-family: 'Arial Narrow', sans-serif !important; 
+
+/* --- BOUTONS UNIVERSELS (Retour, Bilan, Transfert, etc.) --- */
+/* On force TOUS les boutons à être fond blanc, bordure noire, texte noir */
+.btn-gold, button, .btn { 
+    background: #ffffff !important; 
+    color: #000000 !important; 
+    font-weight: bold; 
+    text-transform: uppercase; 
+    padding: 12px 15px; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    transition: 0.3s; 
+    border: 1px solid #000000 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
 }
-/* Permet de fixer le haut et de scroller uniquement le contenu */
-/* 1. La barre du haut : on la colle vraiment au plafond */
+
+/* Force les icônes ou textes à l'intérieur des boutons en noir */
+.btn-gold *, button *, .btn * {
+    color: #000000 !important;
+}
+
+button:hover, .btn-gold:hover { 
+    background: #f0f0f0 !important; 
+    transform: translateY(-2px); 
+}
+
+/* --- STRUCTURES FIXES --- */
 .sticky-header {
     position: sticky;
-    top: 0; 
-    z-index: 50;
-    background: #0a0a0a;
+    top: 70px; 
+    z-index: 40;
+    background: #ffffff;
     padding-bottom: 10px;
 }
-
-/* 2. Le titre du projet : on l'ajuste pour qu'il ne glisse pas dessous */
 .sticky-projet-header {
     position: sticky;
-    top: 55px; /* On le descend pour qu'il soit bien sous le menu */
+    top: 64px; 
     z-index: 40;
-    background: #0a0a0a;
+    background: #ffffff; 
     padding-top: 10px;
     padding-bottom: 15px;
+    margin-top: -10px; 
 }
 
-/* Optionnel : pour rendre le scroll plus fluide sur mobile */
 #listeChantiers, #listeArchives {
     overflow-y: visible;
 }
+
 .glass { 
-    background: #171717; 
-    border: 1px solid #262626; 
+    background: #ffffff; 
+    border: 1px solid #000000; 
     border-radius: 20px; 
-    transition: 0.3s;
-    margin-bottom: 15px; /* Cela crée l'espace entre tes cadres */
+    transition: 0.3s; 
 }
-input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !important; color: white !important; padding: 12px; border-radius: 10px; width: 100%; margin-bottom: 10px; outline: none; }
-.btn-gold { background: #6b705c; color: white; font-weight: bold; text-transform: uppercase; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; transition: 0.3s; border:none; }
-.btn-gold:hover { background: #a5a58d; transform: translateY(-2px); }
+
+input, select { 
+    background: #ffffff !important; 
+    border: 1px solid #000000 !important; 
+    color: #000000 !important; 
+    padding: 12px; 
+    border-radius: 10px; 
+    width: 100%; 
+    margin-bottom: 10px; 
+    outline: none; 
+}
+
+/* --- GESTION DES COULEURS COMPTA --- */
+.row-entree, .montant-entree { color: #008000 !important; font-weight: bold; } 
+.row-sortie, .montant-sortie { color: #ff0000 !important; font-weight: bold; } 
+#soldeChantier { color: #0000ff !important; font-weight: 900; }
+.solde-vide, .solde-negatif { color: #ff0000 !important; }
+
 #logoPreview, #signPreview { max-width: 120px; max-height: 120px; margin: 0 auto 15px; display: block; object-fit: contain; }
+
 @media (max-width: 768px) {
     #viewProjet .glass.p-8 { position: relative; padding: 20px !important; }
-    #chantierTitre { font-size: 1.5rem !important; line-height: 1.2 !important; margin-bottom: 10px !important; }
-    #viewProjet .absolute.right-8.top-8 { position: static !important; text-align: left !important; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+    #chantierTitre { font-size: 1.5rem !important; line-height: 1.2 !important; margin-bottom: 10px !important; color: #000000 !important; }
+    #viewProjet .absolute.right-8.top-8 { position: static !important; text-align: left !important; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); }
     #soldeChantier { font-size: 1.8rem !important; }
 }
+
 #printArea { display: none; }
+
 @media print {
     @page { margin: 0.8cm; size: auto; }
     html, body { height: auto; overflow: visible; background: white !important; }
@@ -79,8 +123,12 @@ input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !impor
     .signature-area { margin-top: 20px; text-align: right; page-break-inside: avoid; }
     .signature-area img { max-width: 120px; max-height: 100px; display: inline-block; object-fit: contain; }
 }
+
 @keyframes pulse-red { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 .alert-pulse { animation: pulse-red 1s infinite; }
+
+/* Force les textes spécifiques en noir */
+#nbProjetsActifs, #bilanCategories, .sticky-header *, .sticky-projet-header * { color: #000000 !important; }
 </style>
 </head>
 <body onkeydown="if(event.key==='Enter') validerParEntree()">
@@ -156,19 +204,15 @@ input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !impor
 </div>
 
        <div id="viewProjet" class="hidden">
-    <div class="sticky-projet-header" style="position: sticky; top: 0px !important; z-index: 100; background: #0a0a0a; padding-bottom: 15px;">
-        
+    <div class="sticky-projet-header" style="position: sticky; top: 60px; z-index: 100; background: #0a0a0a; padding-bottom: 15px;">
         <button onclick="goHome()" class="text-gray-500 mb-2 text-[9px] font-black uppercase flex items-center gap-2 hover:text-white transition">
             <i class="fa-solid fa-chevron-left"></i> Retour au tableau de bord
         </button>
 
-        <div class="glass p-6 border-l-[12px] border-[#6b705c] shadow-2xl relative" style="display: flex; flex-direction: column; min-height: 120px;">
+        <div class="glass p-6 border-l-[12px] border-[#6b705c] shadow-2xl relative">
+            <h1 id="chantierTitre" class="text-2xl font-black text-[#a5a58d] uppercase italic leading-none mb-1"></h1>
+            <p id="chantierInfos" class="text-[10px] opacity-60 font-bold uppercase mb-4"></p>
             
-            <div style="max-width: 65%;">
-                <h1 id="chantierTitre" class="text-2xl font-black text-[#a5a58d] uppercase italic leading-tight mb-1"></h1>
-                <p id="chantierInfos" class="text-[10px] opacity-60 font-bold uppercase mb-4"></p>
-            </div>
-
             <div class="flex flex-wrap gap-3">
                 <button onclick="openSaisie()" class="bg-emerald-700 hover:bg-emerald-600 px-6 py-3 rounded-xl text-[10px] font-black uppercase shadow-lg border border-emerald-500/20">
                     <i class="fa-solid fa-plus mr-2"></i>Nouvelle Saisie
@@ -178,9 +222,9 @@ input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !impor
                 </button>
             </div>
 
-            <div style="position: absolute; right: 15px; top: 20px; text-align: right;">
+            <div class="absolute right-6 top-6 text-right">
                 <p class="text-[9px] uppercase font-black opacity-30">Solde Caisse</p>
-                <p id="soldeChantier" class="text-2xl font-black text-emerald-500" style="margin: 0; line-height: 1;">0 GNF</p>
+                <p id="soldeChantier" class="text-3xl font-black text-emerald-500">0 GNF</p>
             </div>
         </div>
     </div>
@@ -344,7 +388,7 @@ input, select { background: #0a0a0a !important; border: 1px solid #3f3f3f !impor
                 </div>
             </h3>
 
-            <div id="gridComptes" class="grid grid-cols-4 md:grid-cols-4 gap-2 mb-6"></div>
+            <div id="gridComptes" class="grid grid-cols-2 md:grid-cols-2 gap-2 mb-6"></div>
 
             <div class="bg-black/50 p-6 rounded-xl border border-neutral-800">
                 <input type="hidden" id="editOpIndex">
