@@ -10,21 +10,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 
 /* --- FOND BLANC ET TEXTE NOIR --- */
+/* --- FOND BLANC ET TEXTE NOIR --- */
 body { 
-    background: #ffffff; 
-    color: #000000; 
+    background-color: #ffffff !important; 
+    color: #000000 !important; 
     font-family: 'Arial Narrow', sans-serif !important;
-    font-size: 14px !important; 
+    font-size: 14px !important;
+    margin: 0;
+    padding: 0;
 }
 
-/* --- BOUTONS UNIVERSELS (Retour, Bilan, Transfert, etc.) --- */
-/* On force TOUS les boutons à être fond blanc, bordure noire, texte noir */
+/* --- BOUTONS UNIVERSELS --- */
 .btn-gold, button, .btn { 
     background: #ffffff !important; 
     color: #000000 !important; 
     font-weight: bold; 
     text-transform: uppercase; 
-    padding: 12px 15px; 
+    padding: 6px 10px; 
     border-radius: 10px; 
     cursor: pointer; 
     transition: 0.3s; 
@@ -51,7 +53,16 @@ button:hover, .btn-gold:hover {
     top: 70px; 
     z-index: 40;
     background: #ffffff;
-    padding-bottom: 10px;
+    padding-bottom: 2px;
+}
+.modal-content {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 20px;
+    width: 95%;
+    max-width: 500px;
+    position: relative;
+    z-index: 100 !important; /* Ajoute cette ligne ici */
 }
 .sticky-projet-header {
     position: sticky;
@@ -171,59 +182,59 @@ thead.bg-neutral-900 th {
 }
 </style>
 </head>
-<body onkeydown="if(event.key==='Enter') validerParEntree()">
+<body onkeydown="if(event.key==='Enter') validerParEntree()" class="bg-white">
 
 <div id="loginPage" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black">
     <div class="glass p-10 w-full max-w-md text-center shadow-2xl">
-        <img id="loginLogo" src="" class="mx-auto mb-6 h-24 w-24 object-contain rounded-xl shadow-lg border border-[#6b705c]/20">
-        <p class="text-[10px] text-gray-500 uppercase font-black mb-4 tracking-[3px]">Accès Gestionnaire</p>
-        <input type="text" id="userGerant" value="EKELEC" class="text-center mb-2 uppercase font-bold border-[#6b705c]/30" autocomplete="off">
+        <img id="loginLogo" src="https://cdn-icons-png.flaticon.com/512/2906/2906271.png" class="mx-auto mb-6 h-24 w-24 object-contain rounded-xl shadow-lg border border-black/10 bg-white p-2">
+        <p class="text-[10px] text-gray-400 uppercase font-black mb-4 tracking-[3px]">Accès Gestionnaire</p>
+        <input type="text" id="userGerant" value="EKELEC" class="text-center mb-2 uppercase font-bold" autocomplete="off">
         <input type="password" id="passAccess" placeholder="CODE ACCÈS" class="text-center text-2xl tracking-[10px]" autocomplete="new-password">
         <button onclick="checkLogin()" class="btn-gold mt-4 shadow-xl w-full">OUVRIR LA SESSION</button>
     </div>
 </div>
 
 <div id="app" class="hidden">
-    <nav class="p-4 glass m-2 flex justify-between items-center sticky top-0 z-50 shadow-lg">
+    <nav class="p-2 glass m-2 flex justify-between items-center sticky top-0 z-50 shadow-lg bg-white">
         <div class="flex flex-col leading-none">
-            <div class="font-black text-[#a5a58d] uppercase italic flex items-center gap-2">
-                <img id="navLogo" src="" style="height: 25px; width: 25px; object-fit: contain; border-radius: 4px;"> 
-                EKELEC <span class="text-[9px] bg-[#6b705c]/20 px-2 py-1 rounded text-[#a5a58d]">V1.0.0.4</span>
+            <div class="font-black text-black uppercase italic flex items-center gap-2">
+                <img id="navLogo" src="https://cdn-icons-png.flaticon.com/512/2906/2906271.png" style="height: 25px; width: 25px; object-fit: contain;"> 
+                EKELEC <span class="text-[9px] bg-gray-200 px-2 py-1 rounded text-black">V1.0.0.4</span>
             </div>
-            <span id="displayGerant" class="text-[9px] font-black uppercase text-gray-500 mt-1 opacity-70">GÉRANT : </span>
+            <span id="displayGerant" class="text-[9px] font-black uppercase text-gray-500 mt-1">GÉRANT : </span>
         </div>
         <div class="flex gap-4 items-center">
-            <button onclick="openModal('modalSettings')" title="Paramètres" class="text-gray-400 hover:text-[#a5a58d] text-xl transition">
+            <button onclick="openModal('modalSettings')" class="text-gray-600 hover:text-black text-xl transition">
                 <i class="fa-solid fa-gear"></i>
             </button>
-            <input type="file" id="importFile" onchange="importData()" class="hidden">
-            <button onclick="location.reload()" class="text-red-500 text-xl"><i class="fa-solid fa-power-off"></i></button>
+            <button onclick="location.reload()" class="text-red-600 text-xl"><i class="fa-solid fa-power-off"></i></button>
         </div>
     </nav>
-
-    <div class="p-4 max-w-6xl mx-auto">
+    
+    <div class="p-2 max-w-6xl mx-auto">
         <div id="viewAccueil">
     <div class="sticky-header">
-        <div class="flex justify-between items-end mb-4">
+        <div class="flex justify-between items-end mb-2">
             <h2 class="text-[10px] font-black uppercase tracking-[3px] text-gray-500">Tableau de bord</h2>
             <button onclick="printGlobalReport()" class="bg-neutral-800 hover:bg-neutral-700 px-4 py-2 rounded-lg text-[10px] font-black uppercase flex items-center gap-2 border border-neutral-700">
                 <i class="fa-solid fa-print"></i> Bilan Global
             </button>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-2 gap-4 mb-6">
+        <div class="grid grid-cols-2 md:grid-cols-2 gap-4 mb-2">
             <div class="glass p-4 border-b-4 border-gray-500"><p class="text-[9px] uppercase font-black text-gray-500">Projets Actifs</p><p id="statTotalChantiers" class="text-2xl font-black text-white">0</p></div>
             <div class="glass p-4 border-b-4 border-emerald-600"><p class="text-[9px] uppercase font-black text-gray-500">Total Reçu</p><p id="statTotalRecu" class="text-xl font-black text-emerald-500">0 GNF</p></div>
             <div class="glass p-4 border-b-4 border-red-600"><p class="text-[9px] uppercase font-black text-gray-500">Total Dépensé</p><p id="statTotalDepense" class="text-xl font-black text-red-500">0 GNF</p></div>
             <div class="glass p-4 border-b-4 border-[#6b705c]"><p class="text-[9px] uppercase font-black text-gray-500">Solde Comptes</p><p id="statTotalSoldeComptes" class="text-xl font-black text-[#a5a58d]">0 GNF</p></div>
         </div>
 
-        <div class="flex flex-wrap justify-between items-center gap-4 bg-black/80 backdrop-blur-md p-2 rounded-xl border border-white/5">
-            <input type="text" id="searchHome" oninput="renderHome()" placeholder="Rechercher un projet..." class="max-w-xs mb-0" autocomplete="off">
-            <div class="flex gap-2">
+        <div class="flex flex-col items-center gap-4 bg-black/80 backdrop-blur-md p-2 rounded-xl border border-white/5">
+    <input type="text" id="searchHome" oninput="renderHome()" placeholder="Rechercher un projet..." class="w-full mb-0" autocomplete="off">
+    
+    <div class="flex justify-center items-center gap-2 w-full">
                 <button onclick="openFinances()" class="bg-neutral-700 text-white px-4 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg flex items-center gap-2 transition hover:bg-neutral-600"><i class="fa-solid fa-wallet"></i></button>
                 <button onclick="openModal('modalTransfert')" class="bg-neutral-800 text-white px-4 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg flex items-center gap-2 transition hover:bg-neutral-700 border border-neutral-600"><i class="fa-solid fa-exchange-alt"></i></button>
-                <button onclick="viderChantier(); openModal('modalChantier')" class="bg-[#6b705c] text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg hover:bg-[#a5a58d]">+ Nouveau Projet</button>
+                <button onclick="viderChantier(); openModal('modalChantier')" class="bg-[#6b705c] text-white px-3 py-1.5 rounded-lg font-black text-[9px] uppercase shadow-md hover:bg-[#a5a58d]">+ Nouveau Projet</button>
             </div>
         </div>
     </div>
@@ -306,55 +317,62 @@ thead.bg-neutral-900 th {
         <h3 class="font-black mb-6 uppercase text-white italic text-xl flex items-center gap-2">
             <i class="fa-solid fa-gear text-[#a5a58d]"></i> Paramètres
         </h3>
+        
         <div class="space-y-2 mb-4">
-    <div class="bg-neutral-900 p-2 rounded border border-neutral-800 flex items-center gap-2">
-        <label class="bg-[#6b705c] text-white text-[9px] px-2 py-1 rounded font-black cursor-pointer">
-            CHOISIR LOGO <input type="file" id="logoInput" class="hidden" accept="image/*" onchange="previewImage(this, 'logo')">
-        </label>
-        <span class="flex-1 text-[10px] text-gray-500 italic border-l border-neutral-700 pl-2">Logo de l'entreprise</span>
-        <img id="logoPreview" src="" class="hidden">
-    </div>
+            <div class="bg-neutral-900 p-2 rounded border border-neutral-800 flex items-center gap-2">
+                <label class="bg-[#6b705c] text-white text-[9px] px-2 py-1 rounded font-black cursor-pointer hover:bg-[#a5a58d]">
+                    CHOISIR LOGO <input type="file" id="logoInput" class="hidden" accept="image/*" onchange="previewImage(this, 'logo')">
+                </label>
+                <span class="flex-1 text-[10px] text-gray-400 italic border-l border-neutral-700 pl-2">Logo de l'entreprise</span>
+                <img id="logoPreview" src="" class="hidden h-8 w-8 object-contain bg-white rounded">
+            </div>
 
-    <div class="bg-neutral-900 p-2 rounded border border-neutral-800 flex items-center gap-2">
-        <label class="bg-[#6b705c] text-white text-[9px] px-2 py-1 rounded font-black cursor-pointer">
-            CHOISIR CACHET <input type="file" id="signInput" class="hidden" accept="image/*" onchange="previewImage(this, 'sign')">
-        </label>
-        <span class="flex-1 text-[10px] text-gray-500 italic border-l border-neutral-700 pl-2">Cachet / Signature</span>
-        <img id="signPreview" src="" class="hidden">
-    </div>
-</div>
+            <div class="bg-neutral-900 p-2 rounded border border-neutral-800 flex items-center gap-2">
+                <label class="bg-[#6b705c] text-white text-[9px] px-2 py-1 rounded font-black cursor-pointer hover:bg-[#a5a58d]">
+                    CHOISIR CACHET <input type="file" id="signInput" class="hidden" accept="image/*" onchange="previewImage(this, 'sign')">
+                </label>
+                <span class="flex-1 text-[10px] text-gray-400 italic border-l border-neutral-700 pl-2">Cachet / Signature</span>
+                <img id="signPreview" src="" class="hidden h-8 w-8 object-contain bg-white rounded">
+            </div>
+        </div>
+
         <div class="space-y-4">
-            <button onclick="openModal('modalCode'); closeModal('modalSettings')" class="w-full flex items-center justify-between bg-neutral-900 p-4 rounded-xl hover:bg-neutral-800 transition">
+            <button onclick="openModal('modalCode'); closeModal('modalSettings')" class="w-full flex items-center justify-between bg-neutral-900 p-4 rounded-xl hover:bg-neutral-800 transition text-white">
                 <span class="text-[10px] font-black uppercase">Changer le Code d'accès</span>
                 <i class="fa-solid fa-key text-[#a5a58d]"></i>
             </button>
-            <button onclick="copyDataText()" class="w-full flex items-center justify-between bg-neutral-900 p-4 rounded-xl hover:bg-neutral-800 transition">
+            
+            <button onclick="copyDataText()" class="w-full flex items-center justify-between bg-neutral-900 p-4 rounded-xl hover:bg-neutral-800 transition text-white">
                 <span class="text-[10px] font-black uppercase">Copier les données (Secours)</span>
                 <i class="fa-solid fa-copy text-emerald-500"></i>
             </button>
-            <button onclick="exportData()" class="w-full flex items-center justify-between bg-neutral-900 p-4 rounded-xl hover:bg-neutral-800 transition">
+
+            <button onclick="exportData()" class="w-full flex items-center justify-between bg-neutral-900 p-4 rounded-xl hover:bg-neutral-800 transition text-white">
                 <span class="text-[10px] font-black uppercase">Exporter le fichier (Sauvegarde)</span>
                 <i class="fa-solid fa-cloud-arrow-down text-blue-500"></i>
             </button>
-            <button onclick="document.getElementById('importFile').click(); closeModal('modalSettings')" class="w-full flex items-center justify-between bg-neutral-900 p-4 rounded-xl hover:bg-neutral-800 transition">
+
+            <button onclick="document.getElementById('importFile').click(); closeModal('modalSettings')" class="w-full flex items-center justify-between bg-neutral-900 p-4 rounded-xl hover:bg-neutral-800 transition text-white">
                 <span class="text-[10px] font-black uppercase">Importer un fichier</span>
                 <i class="fa-solid fa-upload text-yellow-500"></i>
             </button>
-            <button onclick="reinitialiserTout()" class="w-full flex items-center justify-between bg-red-900/30 p-4 rounded-xl border border-red-600/50 hover:bg-red-600/50 transition mt-6">
-    <span class="text-[10px] font-black uppercase text-red-500">Réinitialiser l'application (Effacer tout)</span>
-    <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
-</button>
+
+            <button onclick="reinitialiserTout()" class="w-full flex items-center justify-between bg-red-900/30 p-4 rounded-xl border border-red-600/50 hover:bg-red-600/50 transition mt-6 text-red-500">
+                <span class="text-[10px] font-black uppercase">Réinitialiser l'application</span>
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </button>
         </div>
-        <button onclick="closeModal('modalSettings')" class="w-full mt-6 text-[10px] opacity-40 uppercase font-black hover:opacity-100">Fermer</button>
+        
+        <button onclick="closeModal('modalSettings')" class="w-full mt-6 text-[10px] text-gray-500 uppercase font-black hover:text-white transition">Fermer</button>
     </div>
 </div>
 
 <div id="modalCode" class="fixed inset-0 bg-black/95 hidden items-center justify-center p-4 z-[200] backdrop-blur-md">
     <div class="glass p-10 w-full max-w-md border-t-[10px] border-[#6b705c] shadow-2xl">
         <h3 class="font-black mb-6 uppercase text-[#a5a58d] italic text-xl">Changer Code Accès</h3>
-        <input type="password" id="newCode" placeholder="NOUVEAU CODE" autocomplete="new-password">
-        <button onclick="changeCode()" class="btn-gold w-full mt-4">ENREGISTRER</button>
-        <button onclick="closeModal('modalCode')" class="w-full mt-4 text-[10px] opacity-40 uppercase font-black">Annuler</button>
+        <input type="password" id="newCode" placeholder="NOUVEAU CODE" maxlength="8" inputmode="numeric" class="text-center text-2xl tracking-[10px]">
+        <button onclick="changeCode()" class="btn-gold w-full mt-4">ENREGISTRER LE CODE</button>
+        <button onclick="closeModal('modalCode')" class="w-full mt-4 text-[10px] text-gray-500 uppercase font-black">Annuler</button>
     </div>
 </div>
 
@@ -362,6 +380,7 @@ thead.bg-neutral-900 th {
     <div class="glass p-10 w-full max-w-md border-t-[10px] border-[#6b705c] shadow-2xl overflow-y-auto max-h-[90vh]">
         <h3 class="font-black mb-4 uppercase text-[#a5a58d] italic text-xl">Saisie de Flux</h3>
         <input type="hidden" id="editIndex">
+        
         <label class="text-[10px] font-black uppercase text-gray-500">Compte utilisé</label>
         <select id="fCompte" class="font-bold border-[#6b705c]/50 border mb-4">
             <option value="ESPECES">ESPÈCES</option>
@@ -372,6 +391,7 @@ thead.bg-neutral-900 th {
             <option value="AUTRES">AUTRES</option>
             <option value="COMPTE EX">COMPTE EX</option>
         </select>
+
         <label class="text-[10px] font-black uppercase text-gray-500">Type de saisie</label>
         <select id="typeSaisie" onchange="toggleForm()" class="font-bold">
             <option value="DIVERS">DIVERS (Caisse)</option>
@@ -379,14 +399,15 @@ thead.bg-neutral-900 th {
             <option value="OUVRIER">OUVRIER (Main d'œuvre)</option>
             <option value="LOCATION">LOCATION</option>
         </select>
+
         <label class="text-[10px] font-black uppercase text-gray-500">Corps de métier / Catégorie</label>
         <select id="fCat" class="font-bold">
             <option value="GENERAL">Général / Divers</option>
             <option value="LOCATAIRE">Locataire</option>
             <option value="DEVIS">Devis</option>
-			<option value="DEPENSE">Depense</option>
+            <option value="DEPENSE">Dépense</option>
             <option value="PROPRIETAIRE">Propriétaire</option>
-			<option value="MANUTENTION">Manutention</option>
+            <option value="MANUTENTION">Manutention</option>
             <option value="ELECTRICITE">Électricité</option>
             <option value="PLOMBERIE">Plomberie</option>
             <option value="MACONNERIE">Maçonnerie</option>
@@ -397,40 +418,80 @@ thead.bg-neutral-900 th {
             <option value="VITRERIE">Vitrerie</option>
             <option value="SOUDURE">Soudure</option>
             <option value="STAFF">Staff</option>
-			<option value="FRAIS G">Frais g</option>
-			<option value="AUTRES">Autres</option>
+            <option value="FRAIS G">Frais Généraux</option>
+            <option value="AUTRES">Autres</option>
         </select>
-        <div id="formD"><input type="text" id="fMotif" placeholder="Désignation" autocomplete="off"><div class="grid grid-cols-2 gap-2"><input type="text" id="fE" placeholder="Reçu" autocomplete="off"><input type="text" id="fS" placeholder="Payé" autocomplete="off"></div></div>
-        <div id="formA" class="hidden"><input type="text" id="fArtNom" placeholder="Nom article" autocomplete="off"><div class="grid grid-cols-2 gap-2"><input type="text" id="fArtP" placeholder="Prix Unit." autocomplete="off"><input type="text" id="fArtQ" placeholder="Quantité" autocomplete="off"></div></div>
-        <div id="formO" class="hidden"><input type="text" id="fOuvNom" oninput="updateOuvrierInfo()" placeholder="Nom ouvrier" autocomplete="off"><input type="text" id="fOuvJob" placeholder="Métier (Ex: Électricien)" autocomplete="off"><input type="text" id="fOuvC" oninput="updateOuvrierInfo()" placeholder="Montant Contrat" autocomplete="off"><div id="infoOuvrierReliquat" class="text-[10px] font-black text-red-400 uppercase mb-1 hidden"></div><input type="text" id="fOuvA" placeholder="Paiement" autocomplete="off"></div>
-        <div id="formL" class="hidden"><input type="text" id="fLocNom" placeholder="Nom et Prénom" autocomplete="off"><input type="text" id="fLocBat" placeholder="N° de bâtiment" autocomplete="off"><div class="grid grid-cols-2 gap-2"><input type="text" id="fLocRecu" placeholder="Reçu (Montant)" autocomplete="off"><input type="text" id="fLocPaye" placeholder="Payé (Sortie)" autocomplete="off"></div><input type="text" id="fLocMois" placeholder="Le(s) mois payé(s)" autocomplete="off"></div>
-        <input type="date" id="fDate">
-        <div class="grid grid-cols-2 gap-3 mt-6"><button onclick="saveEntry(true)" class="bg-emerald-700 text-white font-black rounded-lg text-[10px] uppercase p-4">Suivant</button><button onclick="saveEntry(false)" class="btn-gold">VALIDER</button></div>
-        <button onclick="closeModal('modalSaisie')" class="w-full mt-4 text-[10px] opacity-40 uppercase font-black">Annuler</button>
+
+        <div id="formD">
+            <input type="text" id="fMotif" placeholder="Désignation" autocomplete="off">
+            <div class="grid grid-cols-2 gap-2">
+                <input type="number" id="fE" placeholder="Reçu (+)" autocomplete="off">
+                <input type="number" id="fS" placeholder="Payé (-)" autocomplete="off">
+            </div>
+        </div>
+
+        <div id="formA" class="hidden">
+            <input type="text" id="fArtNom" placeholder="Nom article" autocomplete="off">
+            <div class="grid grid-cols-2 gap-2">
+                <input type="number" id="fArtP" placeholder="Prix Unit." autocomplete="off">
+                <input type="number" id="fArtQ" placeholder="Quantité" autocomplete="off">
+            </div>
+        </div>
+
+        <div id="formO" class="hidden">
+            <input type="text" id="fOuvNom" oninput="updateOuvrierInfo()" placeholder="Nom ouvrier" autocomplete="off">
+            <input type="text" id="fOuvJob" placeholder="Métier (Ex: Électricien)" autocomplete="off">
+            <input type="number" id="fOuvC" oninput="updateOuvrierInfo()" placeholder="Montant Contrat Total" autocomplete="off">
+            <div id="infoOuvrierReliquat" class="text-[10px] font-black text-red-500 uppercase mb-2 p-1 bg-red-100 rounded hidden"></div>
+            <input type="number" id="fOuvA" placeholder="Acompte / Paiement" autocomplete="off">
+        </div>
+
+        <div id="formL" class="hidden">
+            <input type="text" id="fLocNom" placeholder="Nom et Prénom" autocomplete="off">
+            <input type="text" id="fLocBat" placeholder="N° de bâtiment" autocomplete="off">
+            <div class="grid grid-cols-2 gap-2">
+                <input type="number" id="fLocRecu" placeholder="Reçu (+)" autocomplete="off">
+                <input type="number" id="fLocPaye" placeholder="Payé (-)" autocomplete="off">
+            </div>
+            <input type="text" id="fLocMois" placeholder="Mois concerné (Ex: Janvier)">
+        </div>
+
+        <input type="date" id="fDate" class="mt-2">
+        
+        <div class="grid grid-cols-2 gap-3 mt-6">
+            <button onclick="saveEntry(true)" class="bg-emerald-700 text-white font-black rounded-lg text-[10px] uppercase p-4 hover:bg-emerald-600 transition">Suivant</button>
+            <button onclick="saveEntry(false)" class="btn-gold">VALIDER</button>
+        </div>
+        <button onclick="closeModal('modalSaisie')" class="w-full mt-4 text-[10px] text-gray-500 uppercase font-black hover:text-white transition">Annuler</button>
     </div>
 </div>
 
 <div id="modalChantier" class="fixed inset-0 bg-black/95 hidden items-center justify-center p-4 z-[100] backdrop-blur-md">
     <div class="glass p-10 w-full max-w-md border-t-[10px] border-[#6b705c] shadow-2xl">
         <h3 id="chantierModalTitre" class="font-black mb-6 uppercase text-[#a5a58d] italic text-xl">Nouveau Projet</h3>
-        <input type="hidden" id="editChantierIndex"><input type="text" id="cNom" placeholder="NOM DU CHANTIER" autocomplete="off"><input type="text" id="cLieu" placeholder="LOCALISATION" autocomplete="off"><input type="text" id="cClient" placeholder="NOM DU CLIENT" autocomplete="off">
-        <button id="btnCreateChantier" onclick="createChantier()" class="btn-gold shadow-2xl w-full mt-4">CRÉER</button>
-        <button onclick="closeModal('modalChantier')" class="w-full mt-4 text-[10px] opacity-40 uppercase font-black">Annuler</button>
+        <input type="hidden" id="editChantierIndex">
+        <input type="text" id="cNom" placeholder="NOM DU CHANTIER" class="uppercase font-bold" autocomplete="off">
+        <input type="text" id="cLieu" placeholder="LOCALISATION" class="uppercase" autocomplete="off">
+        <input type="text" id="cClient" placeholder="NOM DU CLIENT" class="uppercase" autocomplete="off">
+        <button id="btnCreateChantier" onclick="createChantier()" class="btn-gold shadow-2xl w-full mt-4">CRÉER LE PROJET</button>
+        <button onclick="closeModal('modalChantier')" class="w-full mt-4 text-[10px] text-gray-500 uppercase font-black">Annuler</button>
     </div>
 </div>
 
 <div id="modalFinances" class="fixed inset-0 bg-black/95 hidden items-center justify-center p-2 z-[100] backdrop-blur-md">
-    <div class="glass w-full max-w-2xl border-t-[4px] border-[#6b705c] shadow-2xl flex flex-col max-h-[95vh]"> <div class="p-2 pb-1">
-            <h3 class="font-black mb-1 uppercase text-[#a5a58d] italic text-lg flex justify-between items-center"> <span>Opérations Financières</span>
+    <div class="glass w-full max-w-2xl border-t-[4px] border-[#6b705c] shadow-2xl flex flex-col max-h-[95vh] bg-white"> 
+        <div class="p-3 pb-1">
+            <h3 class="font-black mb-2 uppercase text-[#6b705c] italic text-lg flex justify-between items-center"> 
+                <span>Trésorerie Centrale</span>
                 <div class="flex items-center gap-4">
-                    <span id="soldeGlobalFinances" class="text-xl font-black text-white">0 GNF</span>
-                    <button onclick="closeModal('modalFinances')" class="text-gray-500 hover:text-white text-2xl font-light">&times;</button>
+                    <span id="soldeGlobalFinances" class="text-xl font-black text-black">0 GNF</span>
+                    <button onclick="closeModal('modalFinances')" class="text-gray-400 hover:text-black text-2xl font-light">&times;</button>
                 </div>
             </h3>
 
-            <div id="gridComptes" class="grid grid-cols-2 md:grid-cols-2 gap-1 mb-1"></div>
+            <div id="gridComptes" class="grid grid-cols-2 md:grid-cols-4 gap-1 mb-2"></div>
 
-            <div class="bg-black/50 p-1 rounded-lg border border-neutral-800">
+            <div class="bg-gray-100 p-2 rounded-lg border border-neutral-300">
                 <input type="hidden" id="editOpIndex">
                 
                 <div class="grid grid-cols-2 gap-1 mb-1">
@@ -447,18 +508,18 @@ thead.bg-neutral-900 th {
                 </div>
 
                 <div class="grid grid-cols-3 gap-1"> 
-                    <input type="text" id="opMotif" placeholder="Motif" class="py-1 text-xs" autocomplete="off">
-                    <input type="text" id="opMontant" placeholder="Montant" class="py-1 text-xs"> 
+                    <input type="text" id="opMotif" placeholder="Motif" class="py-1 text-xs uppercase" autocomplete="off">
+                    <input type="number" id="opMontant" placeholder="Montant" class="py-1 text-xs"> 
                     <input type="date" id="opDate" class="py-1 text-xs">
                 </div>
-                <button onclick="saveOperationFinanciere()" class="btn-gold w-full mt-1 py-1 text-[10px]">ENREGISTRER</button>
+                <button onclick="saveOperationFinanciere()" class="btn-gold w-full mt-1 py-1 text-[10px]">ENREGISTRER L'OPÉRATION</button>
             </div>
         </div>
 
         <div class="flex-1 overflow-y-auto px-2 pb-1"> 
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-[10px]">
-                    <thead class="bg-neutral-900 uppercase font-black sticky top-0 z-10">
+                    <thead class="bg-neutral-100 uppercase font-black sticky top-0 z-10 text-black border-b border-black">
                         <tr>
                             <th class="p-2">Compte</th>
                             <th class="p-2">Motif</th>
@@ -466,13 +527,13 @@ thead.bg-neutral-900 th {
                             <th class="p-2 text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="tableOpsBody"></tbody>
+                    <tbody id="tableOpsBody" class="text-black divide-y divide-gray-200"></tbody>
                 </table>
             </div>
         </div>
 
-        <div class="px-4 py-2 border-t border-white/5">
-            <button onclick="closeModal('modalFinances')" class="w-full text-[10px] opacity-40 uppercase font-black">Fermer</button>
+        <div class="px-4 py-2 border-t border-gray-200">
+            <button onclick="closeModal('modalFinances')" class="w-full text-[10px] text-gray-500 uppercase font-black">Fermer la trésorerie</button>
         </div>
     </div>
 </div>
@@ -559,6 +620,9 @@ function previewImage(input, type) {
 function saveDB() { 
     localStorage.setItem('PRO_DB_V9', JSON.stringify(db)); 
     localStorage.setItem('PRO_FINANCE_V1', JSON.stringify(financeDB));
+}
+function saveConfig() {
+    localStorage.setItem('PRO_CONFIG', JSON.stringify(config));
 }
 
 function openModal(id) { 
