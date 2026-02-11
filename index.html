@@ -223,7 +223,19 @@ thead.bg-neutral-900 th {
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-2 gap-4 mb-2">
-            <div class="glass p-4 border-b-4 border-gray-500"><p class="text-[9px] uppercase font-black text-gray-500">Projets Actifs</p><p id="statTotalChantiers" class="text-2xl font-black text-white">0</p></div>
+            <div class="glass p-4 border-b-4 border-gray-500 flex justify-between items-center">
+    
+    <div>
+        <p class="text-[9px] uppercase font-black text-gray-500">Projets Actifs</p>
+        <p id="statTotalChantiers" class="text-2xl font-black text-black">0</p>
+    </div>
+
+    <div class="text-right border-l border-gray-300 pl-4">
+        <p class="text-[9px] uppercase font-black text-gray-500">Fond des Projets</p>
+        <p id="soldeGlobalTousProjets" class="text-xl font-black text-blue-700">0 GNF</p>
+    </div>
+
+</div>
             <div class="glass p-4 border-b-4 border-emerald-600"><p class="text-[9px] uppercase font-black text-gray-500">Total Reçu</p><p id="statTotalRecu" class="text-xl font-black text-emerald-500">0 GNF</p></div>
             <div class="glass p-4 border-b-4 border-red-600"><p class="text-[9px] uppercase font-black text-gray-500">Total Dépensé</p><p id="statTotalDepense" class="text-xl font-black text-red-500">0 GNF</p></div>
             <div class="glass p-4 border-b-4 border-[#6b705c]"><p class="text-[9px] uppercase font-black text-gray-500">Solde Comptes</p><p id="statTotalSoldeComptes" class="text-xl font-black text-[#a5a58d]">0 GNF</p></div>
@@ -407,6 +419,7 @@ thead.bg-neutral-900 th {
             <option value="LOCATAIRE">Locataire</option>
             <option value="DEVIS">Devis</option>
             <option value="DEPENSE">Dépense</option>
+			<option value="ACHATS">Achats</option>
             <option value="PROPRIETAIRE">Propriétaire</option>
             <option value="MANUTENTION">Manutention</option>
             <option value="ELECTRICITE">Électricité</option>
@@ -744,6 +757,24 @@ function renderHome(){
     document.getElementById('statTotalDepense').innerText = gDepense.toLocaleString() + " GNF";
     document.getElementById('statTotalSoldeComptes').innerText = totalComptes.toLocaleString() + " GNF";
     document.getElementById('statTotalSoldeComptes').className = totalComptes < 0 ? "text-xl font-black text-red-500" : "text-xl font-black text-[#a5a58d]";
+// LOGIQUE DE CALCUL GLOBAL (Brique par Brique)
+    let totalArgentTousChantiers = 0;
+    
+    // On additionne le solde de chaque chantier de la base
+    db.forEach(projet => {
+        projet.flux.forEach(operation => {
+            totalArgentTousChantiers += (operation.e - operation.s);
+        });
+    });
+
+    // On envoie le résultat vers l'écran
+    const afficheurGlobal = document.getElementById('soldeGlobalTousProjets');
+    if(afficheurGlobal) {
+        afficheurGlobal.innerText = totalArgentTousChantiers.toLocaleString() + " GNF";
+        
+        // Couleur automatique : Rouge si on est à découvert, Bleu si c'est bon
+        afficheurGlobal.style.color = totalArgentTousChantiers < 0 ? "#FF0000" : "#1d4ed8";
+    }
 }
 
 function openFinances() { viderFormOp(); document.getElementById('opDate').valueAsDate = new Date(); renderFinances(); openModal('modalFinances'); }
@@ -819,15 +850,27 @@ function renderJournal(){
     const lOuv = document.getElementById('listeOuvriers');
     const divBilan = document.getElementById('bilanCategories');
     const divInv = document.getElementById('inventaireMateriel');
+    
     tbody.innerHTML = ""; lOuv.innerHTML = ""; divBilan.innerHTML = ""; divInv.innerHTML = "";
+    
     let workers = {}; let cats = {};
     let runningSolde = 0; let items = {};
+
+    // 1. On trie par date (ancien -> récent) pour le calcul du solde
     c.flux.sort((a, b) => new Date(a.date) - new Date(b.date));
-    c.flux.forEach((f,idx)=>{
+
+    // 2. On prépare les données et on calcule le solde progressif pour chaque ligne
+    // On stocke tout dans un tableau temporaire pour pouvoir l'inverser après
+    let lignesPretes = [];
+
+    c.flux.forEach((f, idx) => {
         runningSolde += (f.e - f.s);
+        
+        // Calcul des catégories et ouvriers (ton code original)
         let ct = f.cat || 'GENERAL';
         if(!cats[ct]) cats[ct] = 0;
         cats[ct] += f.s;
+
         if(f.type==='ARTICLE'){
             let name = f.txt.replace("ARTICLE : ", "").split(" (x")[0];
             let qMatch = f.txt.match(/\(x(\d+)\)/);
@@ -838,8 +881,11 @@ function renderJournal(){
             if(!workers[f.on]) workers[f.on]={job:f.oj, contrat:f.oc, paye:0};
             workers[f.on].paye += f.s;
         }
-        tbody.innerHTML += `<tr class="border-b border-gray-200">
-            <td class="p-5 font-bold uppercase" style="color: #000000;">${f.txt}<br><span class="opacity-50 text-[9px] mr-2">${f.date}</span> <span class="text-[8px] font-black bg-gray-200 px-2 py-0.5 rounded text-black">${f.cat || 'GENERAL'}</span></td>
+
+        // On crée le HTML de la ligne et on le garde en mémoire
+        // On garde "idx" original pour que les boutons modifier/supprimer pointent vers le bon élément
+        let htmlLigne = `<tr class="border-b border-gray-200">
+            <td class="p-5 font-bold uppercase" style="color: #000000;">${f.txt}<br><span class="opacity-50 text-[9px] mr-2">${f.date.split('-').reverse().join('/')}</span> <span class="text-[8px] font-black bg-gray-200 px-2 py-0.5 rounded text-black">${f.cat || 'GENERAL'}</span></td>
             <td class="p-5 font-black opacity-60 text-[10px] uppercase" style="color: #000000;">${f.compte || 'ESPECES'}</td>
             <td class="p-5" style="color: #008000 !important; font-weight: 900 !important;">${f.e > 0 ? f.e.toLocaleString() : '-'}</td>
             <td class="p-5" style="color: #FF0000 !important; font-weight: 900 !important;">${f.s > 0 ? f.s.toLocaleString() : '-'}</td>
@@ -849,18 +895,23 @@ function renderJournal(){
                 <button onclick="deleteEntry(${idx})" class="text-gray-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
             </td>
         </tr>`;
+        
+        lignesPretes.push(htmlLigne);
     });
+
+    // 3. AFFICHAGE INVERSÉ : On injecte les lignes dans le tableau en commençant par la fin
+    lignesPretes.reverse().forEach(ligneHtml => {
+        tbody.innerHTML += ligneHtml;
+    });
+
+    // --- Le reste de ta fonction reste identique pour le Bilan et les Ouvriers ---
     for(let k in cats) { if(cats[k] > 0) divBilan.innerHTML += `<div class="flex justify-between border-b border-neutral-800 pb-1"><span>${k}</span><span class="text-gray-400">${cats[k].toLocaleString()} GNF</span></div>`; }
     for(let it in items) { divInv.innerHTML += `<div class="flex justify-between border-b border-neutral-800 pb-1"><span>${it}</span><span class="text-emerald-500">x ${items[it]}</span></div>`; }
-    // Mise à jour du solde avec couleur dynamique
+    
     const elSolde = document.getElementById('soldeChantier');
     elSolde.innerText = runningSolde.toLocaleString() + " GNF";
-    
-    if (runningSolde < 0) {
-        elSolde.style.color = "#ff0000"; // Rouge si négatif
-    } else {
-        elSolde.style.color = "#0000ff"; // Bleu si positif
-    }
+    elSolde.style.color = (runningSolde < 0) ? "#ff0000" : "#0000ff";
+
     for(let n in workers){
         let r = workers[n].contrat - workers[n].paye;
         lOuv.innerHTML += `<div class="bg-black/50 p-4 rounded-xl border-l-4 border-[#6b705c]">
@@ -898,13 +949,80 @@ function editEntry(idx) {
 function saveEntry(keepOpen) {
     const idx = document.getElementById('editIndex').value;
     const type = document.getElementById('typeSaisie').value;
-    let entry = { type: type, date: document.getElementById('fDate').value, cat: document.getElementById('fCat').value, compte: document.getElementById('fCompte').value, e: 0, s: 0, txt: "", oc: 0, on: "", oj: "", locBat: "", locMois: "" };
-    if(type === 'DIVERS') { entry.e = parseNum(document.getElementById('fE').value); entry.s = parseNum(document.getElementById('fS').value); entry.txt = document.getElementById('fMotif').value || "Divers"; }
-    else if(type === 'ARTICLE') { let p = parseNum(document.getElementById('fArtP').value), q = parseNum(document.getElementById('fArtQ').value); let nomArt = document.getElementById('fArtNom').value; entry.s = p * q; entry.txt = `ARTICLE : ${nomArt.toUpperCase()} (x${q})`; }
-    else if(type === 'OUVRIER') { entry.on = document.getElementById('fOuvNom').value.trim(); entry.oj = document.getElementById('fOuvJob').value; entry.oc = parseNum(document.getElementById('fOuvC').value); entry.s = parseNum(document.getElementById('fOuvA').value); entry.txt = `PAYE : ${entry.on.toUpperCase()}`; }
-    else if(type === 'LOCATION') { const nom = document.getElementById('fLocNom').value.toUpperCase(); const bat = document.getElementById('fLocBat').value; const mois = document.getElementById('fLocMois').value; entry.e = parseNum(document.getElementById('fLocRecu').value); entry.s = parseNum(document.getElementById('fLocPaye').value); entry.locBat = bat; entry.locMois = mois; entry.txt = `LOCATION : ${nom} (BAT: ${bat}) - MOIS: ${mois}`; }
-    if(idx !== "") db[currentId].flux[idx] = entry; else db[currentId].flux.push(entry);
-    saveDB(); renderJournal(); renderHome(); viderSaisie(); if(!keepOpen) closeModal('modalSaisie');
+    
+    // --- RÉCUPÉRATION DES ÉLÉMENTS DE BASE ---
+    const date = document.getElementById('fDate').value;
+    const compte = document.getElementById('fCompte').value;
+
+    // --- SÉCURITÉ 1 : COMMUNE À TOUS ---
+    if (!date) return alert("Erreur : La date est obligatoire !");
+    if (!compte) return alert("Erreur : Sélectionnez un compte !");
+
+    let entry = { 
+        type: type, 
+        date: date, 
+        cat: document.getElementById('fCat').value, 
+        compte: compte, 
+        e: 0, s: 0, txt: "", oc: 0, on: "", oj: "", locBat: "", locMois: "" 
+    };
+
+    // --- SÉCURITÉ 2 : SELON LE TYPE DE SAISIE ---
+    if(type === 'DIVERS') { 
+        entry.e = parseNum(document.getElementById('fE').value); 
+        entry.s = parseNum(document.getElementById('fS').value); 
+        entry.txt = (document.getElementById('fMotif').value || "").trim(); 
+        
+        if (entry.txt === "") return alert("Erreur : Saisissez une désignation !");
+        if (entry.e === 0 && entry.s === 0) return alert("Erreur : Saisissez un montant (Reçu ou Payé) !");
+    } 
+    
+    else if(type === 'ARTICLE') { 
+        let p = parseNum(document.getElementById('fArtP').value);
+        let q = parseNum(document.getElementById('fArtQ').value); 
+        let nomArt = (document.getElementById('fArtNom').value || "").trim(); 
+        
+        if (nomArt === "") return alert("Erreur : Nom de l'article manquant !");
+        if (p <= 0 || q <= 0) return alert("Erreur : Le prix et la quantité doivent être supérieurs à 0 !");
+        
+        entry.s = p * q; 
+        entry.txt = `ARTICLE : ${nomArt.toUpperCase()} (x${q})`; 
+    } 
+    
+    else if(type === 'OUVRIER') { 
+        entry.on = (document.getElementById('fOuvNom').value || "").trim(); 
+        entry.oj = document.getElementById('fOuvJob').value; 
+        entry.oc = parseNum(document.getElementById('fOuvC').value); 
+        entry.s = parseNum(document.getElementById('fOuvA').value); 
+        
+        if (entry.on === "") return alert("Erreur : Nom de l'ouvrier manquant !");
+        if (entry.s === 0 && entry.oc === 0) return alert("Erreur : Saisissez au moins l'avance ou le cachet !");
+        
+        entry.txt = `PAYE : ${entry.on.toUpperCase()}`; 
+    } 
+    
+    else if(type === 'LOCATION') { 
+        const nom = (document.getElementById('fLocNom').value || "").trim().toUpperCase(); 
+        const bat = (document.getElementById('fLocBat').value || "").trim(); 
+        const mois = document.getElementById('fLocMois').value; 
+        
+        if (nom === "" || bat === "" || mois === "") return alert("Erreur : Infos de location incomplètes !");
+        
+        entry.e = parseNum(document.getElementById('fLocRecu').value); 
+        entry.s = parseNum(document.getElementById('fLocPaye').value); 
+        entry.locBat = bat; 
+        entry.locMois = mois; 
+        entry.txt = `LOCATION : ${nom} (BAT: ${bat}) - MOIS: ${mois}`; 
+    }
+
+    // --- ENREGISTREMENT (Si tout est OK) ---
+    if(idx !== "") db[currentId].flux[idx] = entry; 
+    else db[currentId].flux.push(entry);
+
+    saveDB(); 
+    renderJournal(); 
+    renderHome(); 
+    viderSaisie(); 
+    if(!keepOpen) closeModal('modalSaisie');
 }
 
 function viderSaisie() { document.querySelectorAll('#modalSaisie input').forEach(i => i.value = ""); document.getElementById('editIndex').value = ""; document.getElementById('fCat').value = "GENERAL"; document.getElementById('typeSaisie').value = "DIVERS"; document.getElementById('fCompte').value = "ESPECES"; toggleForm(); }
