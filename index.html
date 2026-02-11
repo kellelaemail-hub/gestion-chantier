@@ -183,6 +183,7 @@ thead.bg-neutral-900 th {
 </style>
 </head>
 <body onkeydown="if(event.key==='Enter') validerParEntree()" class="bg-white">
+<input type="file" id="importFile" class="hidden" accept=".json,.txt" onchange="importData(this)">
 
 <div id="loginPage" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black">
     <div class="glass p-10 w-full max-w-md text-center shadow-2xl">
@@ -492,28 +493,46 @@ thead.bg-neutral-900 th {
             <div id="gridComptes" class="grid grid-cols-2 md:grid-cols-4 gap-1 mb-2"></div>
 
             <div class="bg-gray-100 p-2 rounded-lg border border-neutral-300">
-                <input type="hidden" id="editOpIndex">
-                
-                <div class="grid grid-cols-2 gap-1 mb-1">
-                    <select id="opType" class="font-bold py-1 text-xs"><option value="DEPOT">DÉPÔT (+)</option><option value="RETRAIT">RETRAIT (-)</option></select>
-                    <select id="opCompte" class="font-bold py-1 text-xs">
-                        <option value="ESPECES">ESPÈCES</option>
-                        <option value="ORANGE MONEY">OM</option>
-                        <option value="MOBILE MONEY">MoMo</option>
-                        <option value="BANQUE">BANQUE</option>
-                        <option value="PAYCARD">PAYCARD</option>
-                        <option value="AUTRES">AUTRES</option>
-                        <option value="COMPTE EX">COMPTE EX</option>
-                    </select>
-                </div>
+    <input type="hidden" id="editOpIndex">
+    
+    <div class="grid grid-cols-3 gap-1 mb-2">
+        <select id="opType" class="font-bold py-1 text-xs">
+            <option value="DEPOT">DÉPÔT (+)</option>
+            <option value="RETRAIT">RETRAIT (-)</option>
+            <option value="TRANSFERT">TRANSFERT (↔)</option>
+        </select>
+        
+        <select id="opCompteSource" class="font-bold py-1 text-xs bg-red-50">
+            <option value="">DE : (SOURCE)</option>
+            <option value="ESPECES">ESPÈCES</option>
+            <option value="ORANGE MONEY">OM</option>
+            <option value="MOBILE MONEY">MoMo</option>
+            <option value="BANQUE">BANQUE</option>
+            <option value="PAYCARD">PAYCARD</option>
+            <option value="AUTRES">AUTRES</option>
+            <option value="COMPTE EX">COMPTE EX</option>
+        </select>
 
-                <div class="grid grid-cols-3 gap-1"> 
-                    <input type="text" id="opMotif" placeholder="Motif" class="py-1 text-xs uppercase" autocomplete="off">
-                    <input type="number" id="opMontant" placeholder="Montant" class="py-1 text-xs"> 
-                    <input type="date" id="opDate" class="py-1 text-xs">
-                </div>
-                <button onclick="saveOperationFinanciere()" class="btn-gold w-full mt-1 py-1 text-[10px]">ENREGISTRER L'OPÉRATION</button>
-            </div>
+        <select id="opCompteDest" class="font-bold py-1 text-xs bg-emerald-50">
+            <option value="">VERS : (DEST.)</option>
+            <option value="ESPECES">ESPÈCES</option>
+            <option value="ORANGE MONEY">OM</option>
+            <option value="MOBILE MONEY">MoMo</option>
+            <option value="BANQUE">BANQUE</option>
+            <option value="PAYCARD">PAYCARD</option>
+            <option value="AUTRES">AUTRES</option>
+            <option value="COMPTE EX">COMPTE EX</option>
+        </select>
+    </div>
+
+    <div class="grid grid-cols-3 gap-1"> 
+        <input type="text" id="opMotif" placeholder="Motif" class="py-1 text-xs uppercase" autocomplete="off">
+        <input type="number" id="opMontant" placeholder="Montant" class="py-1 text-xs"> 
+        <input type="date" id="opDate" class="py-1 text-xs">
+    </div>
+    
+    <button onclick="saveOperationUnifiee()" class="btn-gold w-full mt-2 py-2 text-[10px]">VALIDER L'OPÉRATION</button>
+</div>
         </div>
 
         <div class="flex-1 overflow-y-auto px-2 pb-1"> 
@@ -1109,7 +1128,25 @@ function importData() {
     };
     reader.readAsText(file);
 }
-
+function exportData() {
+    const data = {
+        projets: db,
+        finances: financeDB,
+        config: config,
+        logo: currentLogo,
+        sign: currentSign,
+        version: "1.0.0.4",
+        dateExport: new Date().toLocaleDateString()
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `SAUVEGARDE_EKELEC_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
 function clearArchives() {
     const codeCheck = prompt("SÉCURITÉ : Entrez le CODE ACCÈS pour vider les archives :");
     if(codeCheck === config.code) {
@@ -1136,8 +1173,37 @@ function reinitialiserTout() {
         alert("CODE INCORRECT");
     }
 }
-function sauvegarderDonnees() {
-    localStorage.setItem('PRO_DB_V9', JSON.stringify(db));
+function saveOperationUnifiee() {
+    const type = document.getElementById('opType').value;
+    const source = document.getElementById('opCompteSource').value;
+    const dest = document.getElementById('opCompteDest').value;
+    const montant = parseFloat(document.getElementById('opMontant').value);
+    const motif = document.getElementById('opMotif').value.toUpperCase() || "SANS MOTIF";
+    const date = document.getElementById('opDate').value;
+
+    if(!montant || !date) return alert("Erreur : Saisir montant et date");
+
+    if(type === 'TRANSFERT') {
+        if(!source || !dest) return alert("Sélectionnez les deux comptes pour le transfert");
+        financeDB.push({ type: 'RETRAIT', compte: source, motif: "TRF VERS " + dest + " (" + motif + ")", montant: montant, date: date });
+        financeDB.push({ type: 'DEPOT', compte: dest, motif: "TRF DE " + source + " (" + motif + ")", montant: montant, date: date });
+    } 
+    else if(type === 'RETRAIT') {
+        if(!source) return alert("Sélectionnez le compte SOURCE");
+        financeDB.push({ type: 'RETRAIT', compte: source, motif: motif, montant: montant, date: date });
+    } 
+    else { // DEPOT
+        if(!dest) return alert("Sélectionnez le compte DESTINATION");
+        financeDB.push({ type: 'DEPOT', compte: dest, motif: motif, montant: montant, date: date });
+    }
+
+    saveDB();
+    renderFinances();
+    alert("Opération enregistrée !");
+    
+    // Nettoyage
+    document.getElementById('opMontant').value = "";
+    document.getElementById('opMotif').value = "";
 }
 </script>
 </body>
