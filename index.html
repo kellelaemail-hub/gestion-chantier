@@ -989,16 +989,38 @@ function saveEntry(keepOpen) {
     } 
     
     else if(type === 'OUVRIER') { 
-        entry.on = (document.getElementById('fOuvNom').value || "").trim(); 
-        entry.oj = document.getElementById('fOuvJob').value; 
-        entry.oc = parseNum(document.getElementById('fOuvC').value); 
-        entry.s = parseNum(document.getElementById('fOuvA').value); 
+    entry.on = (document.getElementById('fOuvNom').value || "").trim().toUpperCase(); 
+    entry.oj = document.getElementById('fOuvJob').value; 
+    
+    // On récupère les deux valeurs
+    let montantSaisi = parseNum(document.getElementById('fOuvC').value); // La case Contrat
+    entry.s = parseNum(document.getElementById('fOuvA').value);          // La case Acompte
+    
+    if (entry.on === "") return alert("Erreur : Nom de l'ouvrier manquant !");
+
+    // SI TU AS SAISI QUELQUE CHOSE DANS LA CASE CONTRAT
+    if (montantSaisi > 0) {
+        entry.oc = montantSaisi; // On prend le nouveau montant (augmentation ou diminution)
         
-        if (entry.on === "") return alert("Erreur : Nom de l'ouvrier manquant !");
-        if (entry.s === 0 && entry.oc === 0) return alert("Erreur : Saisissez au moins l'avance ou le cachet !");
-        
-        entry.txt = `PAYE : ${entry.on.toUpperCase()}`; 
-    } 
+        // MISE À JOUR GLOBALE : On change le contrat sur toutes les anciennes lignes
+        db[currentId].flux.forEach(item => {
+            if(item.type === 'OUVRIER' && item.on === entry.on) {
+                item.oc = montantSaisi;
+            }
+        });
+    } else {
+        // SI LA CASE CONTRAT EST VIDE : On va chercher l'ancien montant pour ne pas le perdre
+        let ancienContrat = 0;
+        db[currentId].flux.forEach(item => {
+            if(item.type === 'OUVRIER' && item.on === entry.on) {
+                ancienContrat = item.oc;
+            }
+        });
+        entry.oc = ancienContrat;
+    }
+    
+    entry.txt = `OUVRIER : ${entry.on}`; 
+}
     
     else if(type === 'LOCATION') { 
         const nom = (document.getElementById('fLocNom').value || "").trim().toUpperCase(); 
